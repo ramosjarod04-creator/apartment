@@ -21,7 +21,7 @@ app = application
 # This is the "Magic Fix": It runs migrations whenever the app starts
 try:
     if not User.objects.filter(username='admin').exists():
-        User.objects.create_superuser('admin', 'admin@example.com', 'YourStrongPassword123')
+        User.objects.create_superuser('admin', 'admin@gmail.com', 'admin123')
         print("Superuser created successfully!")
 except Exception as e:
     print(f"Superuser creation failed: {e}")
