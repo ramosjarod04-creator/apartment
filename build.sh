@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# 1. Install dependencies
+# Install dependencies
 pip install -r requirements.txt
 
-# 2. Run Database Migrations (This fixes your error!)
-python manage.py migrate --noinput
+# Run migrations - THIS IS WHAT FIXES YOUR ERROR
+python3.12 manage.py migrate --noinput
 
-# 3. Collect Static Files
-python manage.py collectstatic --noinput
+# Collect static files
+python3.12 manage.py collectstatic --noinput
