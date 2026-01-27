@@ -14,6 +14,9 @@ from pathlib import Path
 import os
 from decouple import config
 
+import pymysql
+pymysql.install_as_MySQLdb()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='cx7aj7hshlln8+xa48$7p4w1_oxt=(inpdh35twp6_l)u(ml5q')
