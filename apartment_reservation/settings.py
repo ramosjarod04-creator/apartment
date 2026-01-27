@@ -3,32 +3,33 @@ import os
 from decouple import config
 import dj_database_url
 
-# Remove pymysql if you are using Postgres, but keeping it if you need it elsewhere
-# import pymysql
-# pymysql.install_as_MySQLdb()
-
+# BASE_DIR setup
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Security & Debug
 SECRET_KEY = config('SECRET_KEY', default='cx7aj7hshlln8+xa48$7p4w1_oxt=(inpdh35twp6_l)u(ml5q')
-DEBUG = config('DEBUG', default=False, cast=bool) # Set to False for production
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['.vercel.app', 'localhost', '127.0.0.1']
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'whitenoise.runserver_nostatic', # Add this for better static handling
+    # 'cloudinary_storage' MUST be above 'staticfiles'
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
     'reservations',
     'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware', # Must be after SecurityMiddleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -58,7 +59,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'apartment_reservation.wsgi.application'
 
-# Updated Database Logic: Postgres for Vercel, SQLite for Local
+# Database Configuration (Neon Postgres for Vercel, SQLite for Local)
 DATABASES = {
     'default': dj_database_url.config(
         default=os.environ.get('DATABASE_URL', f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
@@ -67,6 +68,7 @@ DATABASES = {
     )
 }
 
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -74,20 +76,28 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Manila'
 USE_I18N = True
 USE_TZ = True
 
-# Static Files Configuration
+# Static Files (WhiteNoise)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# WhiteNoise storage for production compression
+# Media Files (Cloudinary)
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': config('CLOUDINARY_API_KEY'),
+    'API_SECRET': config('CLOUDINARY_API_SECRET'),
+}
+
+# Storage Configuration for Django 4.2+
 STORAGES = {
     "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
@@ -97,6 +107,7 @@ STORAGES = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Authentication URLs
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'dashboard'
 LOGOUT_REDIRECT_URL = 'login'
