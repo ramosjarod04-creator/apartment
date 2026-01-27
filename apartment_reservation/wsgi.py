@@ -14,6 +14,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'apartment_reservation.settings'
 
 application = get_wsgi_application()
 
+app = application
+
 # This is the "Magic Fix": It runs migrations whenever the app starts
 try:
     print("Running migrations...")
