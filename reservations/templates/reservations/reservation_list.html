@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Reservations - Apartment Reservation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>All Reservations</h1>
+        <a href="{% url 'reservation_create' %}" class="btn btn-primary">+ New Reservation</a>
+    </div>
+
+    {% if reservations %}
+    <div class="reservations-grid">
+        {% for reservation in reservations %}
+            {% include 'atomic/molecules/reservation_card.html' with reservation=reservation %}
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No reservations found</h3>
+        <p>Ready to book your apartment?</p>
+        <a href="{% url 'apartment_list' %}" class="btn btn-primary">Browse Apartments</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

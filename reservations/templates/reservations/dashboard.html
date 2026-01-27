@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Property Manager{% endblock %}
+
+{% block content %}
+<div class="container dashboard">
+    <div class="page-header">
+        <div>
+            <h1 class="main-title">Dashboard</h1>
+            <p class="subtitle">Welcome back, {{ user.first_name|default:user.username }}! Here's your overview.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'reservation_create' %}" class="btn-primary-style">+ New Booking</a>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary"></div>
+            <div class="stat-info">
+                <span class="stat-label">Total Units</span>
+                <h3 class="stat-value">{{ total_apartments }}</h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon success"></div>
+            <div class="stat-info">
+                <span class="stat-label">Available</span>
+                <h3 class="stat-value">{{ available_apartments }}</h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon warning"></div>
+            <div class="stat-info">
+                <span class="stat-label">Pending</span>
+                <h3 class="stat-value">{{ pending_reservations }}</h3>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon info"></div>
+            <div class="stat-info">
+                <span class="stat-label">Approved</span>
+                <h3 class="stat-value">{{ approved_reservations }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="dashboard-main-grid">
+        <div class="dashboard-column shadow-card">
+            <div class="column-header">
+                <h2>Recent Reservations</h2>
+                <a href="{% url 'reservation_list' %}" class="link-action">View All →</a>
+            </div>
+
+            {% if recent_reservations %}
+            <div class="activity-feed-container">
+                <div class="activity-feed">
+                    {% for reservation in recent_reservations %}
+                    <div class="activity-item">
+                        <div class="activity-icon {{ reservation.status }}"></div>
+                        <div class="activity-content">
+                            <p><strong>Unit {{ reservation.apartment.unit_number }}</strong> reserved by {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
+                            <span class="activity-time">{{ reservation.created_at|date:"M d, Y" }}</span>
+                        </div>
+                        <span class="badge-status {{ reservation.status }}">{{ reservation.get_status_display }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-placeholder">
+                <p>No recent activity found.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="dashboard-column shadow-card">
+            <div class="column-header">
+                <h2>Featured Units</h2>
+                <a href="{% url 'apartment_list' %}" class="link-action">Browse All →</a>
+            </div>
+
+            <div class="mini-unit-list">
+                {% for apartment in featured_apartments|slice:":3" %}
+                <a href="{% url 'apartment_detail' apartment.pk %}" class="mini-unit-item">
+                    {% if apartment.image %}
+                    <img src="{{ apartment.image.url }}" alt="Unit">
+                    {% else %}
+                    <div class="mini-img-placeholder"></div>
+                    {% endif %}
+                    <div class="mini-unit-details">
+                        <span class="unit-code">Unit {{ apartment.unit_number }}</span>
+                        <span class="unit-price">₱{{ apartment.price_per_month|floatformat:0 }}/mo</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Consistent Color Palette */
+    :root {
+        --primary: #2563eb;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+        --dark: #1e293b;
+        --gray-text: #64748b;
+        --white: #ffffff;
+        --border: #e2e8f0;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .main-title { font-size: 2rem; color: var(--dark); font-weight: 800; }
+    .subtitle { color: var(--gray-text); margin-top: 4px; }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2.5rem;
+    }
+
+    .btn-primary-style {
+        background-color: var(--primary);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform 0.2s;
+    }
+
+    .btn-primary-style:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
+
+    /* STATS GRID */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .stat-card {
+        background: var(--white);
+        padding: 20px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .stat-icon.primary { background: #eff6ff; }
+    .stat-icon.success { background: #ecfdf5; }
+    .stat-icon.warning { background: #fffbeb; }
+    .stat-icon.info { background: #f0f9ff; }
+
+    .stat-label { font-size: 0.875rem; color: var(--gray-text); font-weight: 500; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--dark); margin: 0; }
+
+    /* LAYOUT GRID */
+    .dashboard-main-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    .shadow-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 24px;
+        border: 1px solid var(--border);
+    }
+
+    .column-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .link-action { text-decoration: none; color: var(--primary); font-weight: 600; font-size: 0.9rem; }
+
+    /* ACTIVITY FEED - SCROLLABLE (Shows exactly 3 items) */
+    .activity-feed-container {
+        max-height: 280px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 8px;
+    }
+
+    /* Custom Scrollbar */
+    .activity-feed-container::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .activity-feed-container::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    .activity-feed-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+
+    .activity-feed-container::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    .activity-feed { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 12px; 
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 12px;
+        background: #f8fafc;
+        gap: 12px;
+        transition: background 0.2s;
+    }
+
+    .activity-item:hover {
+        background: #f1f5f9;
+    }
+
+    .activity-icon { 
+        width: 10px; 
+        height: 10px; 
+        border-radius: 50%; 
+        flex-shrink: 0;
+    }
+    .activity-icon.pending { background: var(--warning); }
+    .activity-icon.approved { background: var(--success); }
+    .activity-icon.denied { background: #ef4444; }
+    .activity-icon.cancelled { background: #6b7280; }
+
+    .activity-content { flex: 1; min-width: 0; }
+    .activity-content p { margin: 0; font-size: 0.95rem; color: var(--dark); }
+    .activity-time { font-size: 0.8rem; color: var(--gray-text); display: block; margin-top: 2px; }
+
+    /* MINI UNITS */
+    .mini-unit-list { display: flex; flex-direction: column; gap: 12px; }
+    .mini-unit-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        text-decoration: none;
+        padding: 8px;
+        border-radius: 8px;
+        transition: background 0.2s;
+    }
+    .mini-unit-item:hover { background: #f1f5f9; }
+
+    .mini-unit-item img, .mini-img-placeholder {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    .mini-img-placeholder { 
+        background: #e2e8f0; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 1.5rem;
+    }
+    .unit-code { display: block; font-weight: 600; color: var(--dark); }
+    .unit-price { font-size: 0.85rem; color: var(--primary); font-weight: 500; }
+
+    /* STATUS BADGES */
+    .badge-status {
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .badge-status.pending { background: #fff7ed; color: #9a3412; }
+    .badge-status.approved { background: #f0fdf4; color: #166534; }
+    .badge-status.denied { background: #fef2f2; color: #991b1b; }
+    .badge-status.cancelled { background: #f3f4f6; color: #374151; }
+
+    .empty-placeholder {
+        text-align: center;
+        padding: 2rem;
+        color: var(--gray-text);
+    }
+
+    @media (max-width: 992px) {
+        .dashboard-main-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}

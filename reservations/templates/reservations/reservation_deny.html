@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Deny Reservation - Admin{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container" style="max-width: 600px; margin: 4rem auto;">
+        <div class="form-header" style="text-align: center; margin-bottom: 2rem;">
+            <h1 style="color: #ef4444;">Deny Reservation</h1>
+            <p>Please provide a reason for denying this request.</p>
+        </div>
+
+        <div class="reservation-summary" style="background: #f8fafc; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #e2e8f0;">
+            <p><strong>Apartment:</strong> Unit {{ reservation.apartment.unit_number }}</p>
+            <p><strong>Applicant:</strong> {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
+            <p><strong>Stay:</strong> {{ reservation.start_date }} to {{ reservation.end_date }}</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+                <label for="admin_notes" class="form-label" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Reason for Denial (Sent to User):</label>
+                <textarea name="admin_notes" id="admin_notes" rows="4" class="form-control" style="width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #cbd5e1;" required placeholder="e.g. Unit is undergoing maintenance / Credit check failed..."></textarea>
+            </div>
+
+            <div class="form-actions" style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn-danger" style="flex: 1; background: #ef4444; color: white; border: none; padding: 0.8rem; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    Confirm Denial
+                </button>
+                <a href="{% url 'reservation_list' %}" class="btn-outline" style="flex: 1; text-align: center; text-decoration: none; color: #64748b; border: 1px solid #e2e8f0; padding: 0.8rem; border-radius: 8px;">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-container {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+</style>
+{% endblock %}

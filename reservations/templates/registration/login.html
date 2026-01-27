@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Apartment Reservation{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h1>Welcome Back</h1>
+            <p>Login to manage your apartment reservations</p>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            {% include 'atomic/atoms/input.html' with name='username' label='Username' type='text' required=True %}
+            {% include 'atomic/atoms/input.html' with name='password' label='Password' type='password' required=True %}
+
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Don't have an account? <a href="{% url 'register' %}" class="link">Register here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

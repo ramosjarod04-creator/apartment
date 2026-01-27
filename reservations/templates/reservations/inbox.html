@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <h1>✉️ Messages</h1>
+        <a href="{% url 'send_message' %}" class="btn btn-primary">+ New Message</a>
+    </div>
+
+    <div class="inbox-wrapper">
+        {% if conversation_data %}
+            <div class="conversation-list">
+                {% for data in conversation_data %}
+                <div class="conversation-row {% if data.unread_count > 0 %}unread{% endif %}" 
+                     onclick="window.location='{% url 'message_detail' data.conversation.pk %}'">
+                    
+                    <div class="conv-avatar">
+                        <span class="avatar-circle">
+                            {{ data.other_user.username|slice:":1"|upper }}
+                        </span>
+                    </div>
+                    
+                    <div class="conv-main">
+                        <div class="conv-header">
+                            <strong class="conv-user">{{ data.other_user.get_full_name|default:data.other_user.username }}</strong>
+                            {% if data.other_user.is_staff %}
+                                <span class="badge-admin">Admin</span>
+                            {% endif %}
+                            {% if data.unread_count > 0 %}
+                                <span class="unread-badge">{{ data.unread_count }}</span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="conv-subject">{{ data.conversation.subject }}</div>
+                        
+                        <div class="conv-preview">
+                            {% if data.last_message %}
+                                <span class="preview-sender">
+                                    {% if data.last_message.sender == user %}You:{% else %}{{ data.last_message.sender.username }}:{% endif %}
+                                </span>
+                                <span class="preview-text">{{ data.last_message.content|truncatechars:80 }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="conv-meta">
+                        {% if data.last_message %}
+                            <span class="conv-date">{{ data.last_message.created_at|timesince }} ago</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <h3>No conversations yet</h3>
+                <p>Start a conversation by clicking "New Message" above</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .inbox-wrapper {
+        max-width: 1000px;
+        margin: 2rem auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .conversation-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .conversation-row {
+        display: grid;
+        grid-template-columns: 60px 1fr 120px;
+        gap: 15px;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        cursor: pointer;
+        transition: all 0.2s;
+        align-items: center;
+    }
+
+    .conversation-row:hover {
+        background: #f9fafb;
+    }
+
+    .conversation-row.unread {
+        background: #eff6ff;
+        border-left: 4px solid #2563eb;
+    }
+
+    .conversation-row:last-child {
+        border-bottom: none;
+    }
+
+    .conv-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .avatar-circle {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .conv-main {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+    }
+
+    .conv-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .conv-user {
+        font-size: 1rem;
+        color: #1e293b;
+    }
+
+    .badge-admin {
+        background: #fbbf24;
+        color: #78350f;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .unread-badge {
+        background: #2563eb;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin-left: auto;
+    }
+
+    .conv-subject {
+        color: #2563eb;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .conv-preview {
+        color: #64748b;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .preview-sender {
+        font-weight: 600;
+        color: #475569;
+    }
+
+    .conv-meta {
+        text-align: right;
+        color: #94a3b8;
+        font-size: 0.85rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state h3 {
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #64748b;
+    }
+
+    @media (max-width: 768px) {
+        .conversation-row {
+            grid-template-columns: 50px 1fr;
+        }
+        
+        .conv-meta {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}

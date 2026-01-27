@@ -1,0 +1,36 @@
+<div class="reservation-card">
+    <div class="reservation-header">
+        <h4>{{ reservation.apartment.name }}</h4>
+        <span class="badge badge-{{ reservation.status }}">{{ reservation.get_status_display }}</span>
+    </div>
+    <div class="reservation-details">
+        {% if user.is_staff %}
+        <p><strong>Tenant:</strong> {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
+        {% endif %}
+        <p><strong>Unit:</strong> {{ reservation.apartment.unit_number }}</p>
+        <p><strong>Check-in:</strong> {{ reservation.check_in }}</p>
+        <p><strong>Check-out:</strong> {{ reservation.check_out }}</p>
+        <p><strong>Duration:</strong> {{ reservation.months }} month(s)</p>
+        <p><strong>Total:</strong> ₱{{ reservation.total_price|floatformat:2 }}</p>
+        {% if reservation.reviewed_by %}
+        <p><strong>Reviewed by:</strong> {{ reservation.reviewed_by.get_full_name|default:reservation.reviewed_by.username }}</p>
+        {% endif %}
+        {% if reservation.admin_notes and user.is_staff or reservation.status == 'denied' %}
+        <p><strong>Notes:</strong> {{ reservation.admin_notes }}</p>
+        {% endif %}
+    </div>
+    <div class="reservation-actions">
+        {% if user.is_staff and reservation.status == 'pending' %}
+            <a href="{% url 'reservation_approve' reservation.pk %}" class="btn btn-success btn-sm"> Approve</a>
+            <a href="{% url 'reservation_deny' reservation.pk %}" class="btn btn-danger btn-sm"> Deny</a>
+        {% endif %}
+        
+        {% if reservation.status == 'pending' and not user.is_staff %}
+            <a href="{% url 'reservation_update' reservation.pk %}" class="btn btn-secondary btn-sm">Edit</a>
+        {% endif %}
+        
+        {% if reservation.status in 'pending,approved' %}
+            <a href="{% url 'reservation_delete' reservation.pk %}" class="btn btn-danger btn-sm">Cancel</a>
+        {% endif %}
+    </div>
+</div>

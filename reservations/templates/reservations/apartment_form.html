@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Apartment - Apartment Reservation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container">
+        <div class="form-header">
+            <h1>{{ action }} Apartment</h1>
+            <a href="{% url 'apartment_list' %}" class="btn btn-outline">← Back</a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="apartment-form">
+            {% csrf_token %}
+            
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                    <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save Apartment</button>
+                <a href="{% url 'apartment_list' %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

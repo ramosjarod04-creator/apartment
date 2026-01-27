@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Reservation - Apartment Reservation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="form-container" style="max-width: 500px; margin: 4rem auto; text-align: center;">
+        <div class="form-header">
+            <h1 style="color: #ef4444;">Cancel Reservation?</h1>
+        </div>
+
+        <div class="alert alert-danger" style="background-color: #fee2e2; color: #991b1b; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; text-align: left;">
+            <p style="margin-bottom: 0.5rem;">Are you sure you want to cancel the reservation for:</p>
+            <p><strong>Unit {{ reservation.apartment.unit_number }}</strong></p>
+            <p><small>Guest: {{ reservation.user.get_full_name|default:reservation.user.username }}</small></p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions" style="display: flex; flex-direction: column; gap: 1rem;">
+                <button type="submit" class="btn-danger">Yes, Cancel Reservation</button>
+                <a href="{% url 'reservation_list' %}" class="btn-outline-style">No, Go Back</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-container {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-outline-style {
+    text-decoration: none;
+    color: #64748b;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    text-align: center;
+}
+</style>
+{% endblock %}

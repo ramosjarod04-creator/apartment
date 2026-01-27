@@ -1,0 +1,115 @@
+<div class="filter-bar">
+    <form method="get" class="filter-form">
+        <input type="text" name="search" placeholder="Search apartments..." class="form-input" value="{{ search }}">
+        
+        <select name="type" class="form-select">
+            <option value="">All Types</option>
+            <option value="studio" {% if apartment_type == 'studio' %}selected{% endif %}>Studio</option>
+            <option value="1br" {% if apartment_type == '1br' %}selected{% endif %}>1 Bedroom</option>
+            <option value="2br" {% if apartment_type == '2br' %}selected{% endif %}>2 Bedrooms</option>
+            <option value="3br" {% if apartment_type == '3br' %}selected{% endif %}>3 Bedrooms</option>
+            <option value="penthouse" {% if apartment_type == 'penthouse' %}selected{% endif %}>Penthouse</option>
+        </select>
+
+        <select name="status" class="form-select">
+            <option value="">All Status</option>
+            <option value="available" {% if status == 'available' %}selected{% endif %}>Available</option>
+            <option value="occupied" {% if status == 'occupied' %}selected{% endif %}>Occupied</option>
+            <option value="maintenance" {% if status == 'maintenance' %}selected{% endif %}>Maintenance</option>
+        </select>
+
+        <input type="number" name="min_price" placeholder="Min Price" class="form-input" value="{{ min_price }}">
+        <input type="number" name="max_price" placeholder="Max Price" class="form-input" value="{{ max_price }}">
+
+        <button type="submit" class="btn btn-primary">Filter</button>
+        <a href="{% url 'apartment_list' %}" class="btn btn-outline">Clear</a>
+    </form>
+</div>
+
+<style>
+.filter-bar {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    margin-bottom: 2rem;
+    border: 1px solid #e2e8f0;
+}
+
+.filter-form {
+    display: grid;
+    grid-template-columns: 2fr repeat(2, 1fr) repeat(2, 1fr) auto auto;
+    gap: 1rem;
+    align-items: center;
+}
+
+.form-input,
+.form-select {
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    background: white;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-select {
+    cursor: pointer;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+    color: white;
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+}
+
+.btn-outline {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-outline:hover {
+    background-color: #e2e8f0;
+    border-color: #cbd5e1;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .filter-form {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-form {
+        grid-template-columns: 1fr;
+    }
+}
+</style>

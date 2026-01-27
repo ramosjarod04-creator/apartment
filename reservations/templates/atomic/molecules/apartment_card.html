@@ -1,0 +1,35 @@
+<div class="apartment-card {% if apartment.status == 'occupied' %}is-occupied{% endif %}">
+    <div class="image-wrapper">
+        {% if apartment.status == 'occupied' %}
+            <div class="occupied-watermark">OCCUPIED</div>
+        {% endif %}
+        
+        {% if apartment.image %}
+            <img src="{{ apartment.image.url }}" alt="Unit {{ apartment.unit_number }}">
+        {% else %}
+            <div class="placeholder">🏢</div>
+        {% endif %}
+    </div>
+
+    <div class="card-details">
+        <h2 class="room-title">Unit {{ apartment.unit_number }}</h2>
+        <p class="compound-subtitle">{{ apartment.name }}</p>
+        
+        <div class="price-tag">₱{{ apartment.price_per_month|floatformat:2 }}/mo</div>
+    </div>
+</div>
+    <div class="apartment-details">
+        <h3>{{ apartment.name }}</h3>
+        <p class="apartment-unit">Unit {{ apartment.unit_number }} • Floor {{ apartment.floor }}</p>
+        <div class="apartment-features">
+            <span>🛏️ {{ apartment.bedrooms }} BR</span>
+            <span>🚿 {{ apartment.bathrooms }} BA</span>
+            <span>📐 {{ apartment.size_sqm }} m²</span>
+        </div>
+        <p class="apartment-type">{{ apartment.get_apartment_type_display }}</p>
+        <div class="apartment-footer">
+            <p class="apartment-price">₱{{ apartment.price_per_month|floatformat:2 }}<span>/month</span></p>
+            <a href="{% url 'apartment_detail' apartment.pk %}" class="btn btn-primary btn-sm">View Details</a>
+        </div>
+    </div>
+</div>

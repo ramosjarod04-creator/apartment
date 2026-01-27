@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Panel - Apartment Reservation{% endblock %}
+
+{% block content %}
+<div class="container admin-panel">
+    <div class="page-header">
+        <div>
+            <h1> Admin Panel</h1>
+            <p>Management Dashboard for Administrators</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline">Back to Dashboard</a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card warning">
+            <div class="stat-icon"></div>
+            <div class="stat-content">
+                <h3>Pending Approvals</h3>
+                <p class="stat-value">{{ pending_reservations.count }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card info">
+            <div class="stat-icon"></div>
+            <div class="stat-content">
+                <h3>Total Users</h3>
+                <p class="stat-value">{{ total_users }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card primary">
+            <div class="stat-icon"></div>
+            <div class="stat-content">
+                <h3>Total Reservations</h3>
+                <p class="stat-value">{{ total_reservations }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card success">
+            <div class="stat-icon"></div>
+            <div class="stat-content">
+                <h3>Approved Today</h3>
+                <p class="stat-value">{{ approved_today }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Quick Actions</h2>
+        <div class="quick-actions-grid">
+            <a href="{% url 'apartment_create' %}" class="action-card">
+                <span class="action-icon"></span>
+                <h3>Add Apartment</h3>
+                <p>Add a new apartment unit</p>
+            </a>
+
+            <a href="{% url 'apartment_list' %}" class="action-card">
+                <span class="action-icon"></span>
+                <h3>Manage Apartments</h3>
+                <p>View and edit all apartments</p>
+            </a>
+
+            <a href="{% url 'reservation_list' %}?view=all" class="action-card">
+                <span class="action-icon"></span>
+                <h3>All Reservations</h3>
+                <p>View all user reservations</p>
+            </a>
+
+            <a href="{% url 'reservation_create' %}" class="action-card">
+                <span class="action-icon"></span>
+                <h3>Book Apartment</h3>
+                <p>Create your own reservation</p>
+            </a>
+        </div>
+    </div>
+
+    <div class="section pending-section">
+        <div class="section-header">
+            <h2> Pending Approvals ({{ pending_reservations.count }})</h2>
+            <a href="{% url 'reservation_list' %}?view=all&status=pending" class="btn btn-secondary">View All</a>
+        </div>
+
+        {% if pending_reservations %}
+        <div class="admin-reservations-table">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Tenant</th>
+                        <th>Apartment</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Duration</th>
+                        <th>Total</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reservation in pending_reservations %}
+                    <tr>
+                        <td>
+                            <strong>{{ reservation.user.get_full_name|default:reservation.user.username }}</strong><br>
+                            <small>{{ reservation.user.email }}</small>
+                        </td>
+                        <td>
+                            {{ reservation.apartment.name }}<br>
+                            <small>Unit {{ reservation.apartment.unit_number }}</small>
+                        </td>
+                        <td>{{ reservation.check_in }}</td>
+                        <td>{{ reservation.check_out }}</td>
+                        <td>{{ reservation.months }} month(s)</td>
+                        <td class="amount">₱{{ reservation.total_price|floatformat:2 }}</td>
+                        <td>{{ reservation.created_at|date:"M d, Y" }}</td>
+                        <td class="actions">
+                            <a href="{% url 'reservation_approve' reservation.pk %}" class="btn btn-success btn-sm"> Approve</a>
+                            <a href="{% url 'reservation_deny' reservation.pk %}" class="btn btn-danger btn-sm"> Deny</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No pending approvals</h3>
+            <p>All reservations have been reviewed!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.admin-panel { padding: 2rem 0; }
+.quick-actions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+.action-card { background-color: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); text-align: center; transition: all 0.2s; text-decoration: none; color: inherit; }
+.action-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); color: var(--primary); }
+.action-icon { font-size: 3rem; display: block; margin-bottom: 1rem; }
+.action-card h3 { margin-bottom: 0.5rem; color: var(--gray-900); }
+.action-card p { color: var(--gray-600); font-size: 0.875rem; }
+.pending-section { border-left: 4px solid black; }
+.admin-reservations-table { overflow-x: auto; }
+.data-table { width: 100%; border-collapse: collapse; background-color: white; }
+.data-table th { padding: 1rem; text-align: left; font-weight: 600; color: var(--gray-700); border-bottom: 2px solid var(--gray-200); }
+.data-table td { padding: 1rem; border-bottom: 1px solid var(--gray-200); }
+.data-table .amount { font-weight: 700; color: var(--primary); }
+.data-table .actions { display: flex; gap: 0.5rem; }
+</style>
+{% endblock %}

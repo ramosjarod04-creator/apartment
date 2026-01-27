@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ apartment.name }} - Apartment Reservation{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="apartment-detail">
+        <div class="apartment-detail-header">
+            <h1>{{ apartment.name }}</h1>
+            <span class="badge badge-{{ apartment.status }}">{{ apartment.get_status_display }}</span>
+        </div>
+
+        <div class="apartment-detail-grid">
+            <div class="apartment-detail-image">
+                {% if apartment.image %}
+                <img src="{{ apartment.image.url }}" alt="{{ apartment.name }}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'apartment-placeholder-large\'>🏢<br><small style=\'font-size: 1rem;\'>Image not found</small></div>';">
+                {% else %}
+                <div class="apartment-placeholder-large"><br><small style="font-size: 1rem; font-weight: normal;">No image uploaded</small></div>
+                {% endif %}
+            </div>
+
+            <div class="apartment-detail-info">
+                <div class="info-section">
+                    <h2>Details</h2>
+                    <p><strong>Unit Number:</strong> {{ apartment.unit_number }}</p>
+                    <p><strong>Floor:</strong> {{ apartment.floor }}</p>
+                    <p><strong>Type:</strong> {{ apartment.get_apartment_type_display }}</p>
+                    <p><strong>Bedrooms:</strong> {{ apartment.bedrooms }}</p>
+                    <p><strong>Bathrooms:</strong> {{ apartment.bathrooms }}</p>
+                    <p><strong>Size:</strong> {{ apartment.size_sqm }} m²</p>
+                </div>
+
+                <div class="info-section">
+                    <h2>Price</h2>
+                    <p class="price-large">₱{{ apartment.price_per_month|floatformat:2 }}/month</p>
+                </div>
+
+                <div class="info-section">
+                    <h2>Description</h2>
+                    <p>{{ apartment.description }}</p>
+                </div>
+
+                <div class="info-section">
+                    <h2>Amenities</h2>
+                    <ul class="amenities-list">
+                        {% for amenity in apartment.get_amenities_list %}
+                        <li>✓ {{ amenity }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="detail-actions">
+                    {% if apartment.status == 'available' %}
+                    <a href="{% url 'reservation_create' %}?apartment={{ apartment.pk }}" class="btn btn-primary btn-lg">Book Now</a>
+                    {% endif %}
+                    {% if user.is_staff %}
+                    <a href="{% url 'apartment_update' apartment.pk %}" class="btn btn-secondary">Edit</a>
+                    <a href="{% url 'apartment_delete' apartment.pk %}" class="btn btn-danger">Delete</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

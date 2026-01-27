@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Apartment Reservation{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card auth-card-large">
+        <div class="auth-header">
+            <h1>Create Account</h1>
+            <p>Join us to find your perfect apartment</p>
+        </div>
+
+        <form method="post" class="auth-form">
+            {% csrf_token %}
+            
+            <h3>Account Information</h3>
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                    <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <h3>Tenant Profile</h3>
+            {% for field in profile_form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                    <span class="form-error">{{ error }}</span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-primary btn-block">Register</button>
+        </form>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{% url 'login' %}" class="link">Login here</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}
