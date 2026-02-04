@@ -1,65 +1,176 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ apartment.name }} - Apartment Reservation{% endblock %}
+{% block title %} {{ apartment.name }} - Apartment Reservation {% endblock %}
 
 {% block content %}
 <div class="container">
     <div class="apartment-detail">
         <div class="apartment-detail-header">
-            <h1>{{ apartment.name }}</h1>
-            <span class="badge badge-{{ apartment.status }}">{{ apartment.get_status_display }}</span>
+            <div class="header-main">
+                <h1>{{ apartment.name }}</h1>
+                <span class="badge badge-{{ apartment.status }}">{{ apartment.get_status_display }}</span>
+            </div>
+            <a href="javascript:history.back()" class="btn btn-outline btn-sm hide-mobile">Back</a>
         </div>
 
         <div class="apartment-detail-grid">
             <div class="apartment-detail-image">
                 {% if apartment.image %}
-                <img src="{{ apartment.image.url }}" alt="{{ apartment.name }}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'apartment-placeholder-large\'>🏢<br><small style=\'font-size: 1rem;\'>Image not found</small></div>';">
+                <img src="{{ apartment.image.url }}" alt="{{ apartment.name }}" onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'apartment-placeholder-large\'><small>Image not found</small></div>';">
                 {% else %}
-                <div class="apartment-placeholder-large"><br><small style="font-size: 1rem; font-weight: normal;">No image uploaded</small></div>
+                <div class="apartment-placeholder-large">
+                    <small>No image uploaded</small>
+                </div>
                 {% endif %}
             </div>
 
             <div class="apartment-detail-info">
                 <div class="info-section">
-                    <h2>Details</h2>
-                    <p><strong>Unit Number:</strong> {{ apartment.unit_number }}</p>
-                    <p><strong>Floor:</strong> {{ apartment.floor }}</p>
-                    <p><strong>Type:</strong> {{ apartment.get_apartment_type_display }}</p>
-                    <p><strong>Bedrooms:</strong> {{ apartment.bedrooms }}</p>
-                    <p><strong>Bathrooms:</strong> {{ apartment.bathrooms }}</p>
-                    <p><strong>Size:</strong> {{ apartment.size_sqm }} m²</p>
+                    <p class="price-large">₱{{ apartment.price_per_month|floatformat:2 }}<span>/month</span></p>
                 </div>
 
-                <div class="info-section">
-                    <h2>Price</h2>
-                    <p class="price-large">₱{{ apartment.price_per_month|floatformat:2 }}/month</p>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Unit:</strong> {{ apartment.unit_number }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Floor:</strong> {{ apartment.floor }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Type:</strong> {{ apartment.get_apartment_type_display }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Size:</strong> {{ apartment.size_sqm }} m²
+                    </div>
+                    <div class="info-item">
+                        <strong>Bedrooms:</strong> {{ apartment.bedrooms }}
+                    </div>
+                    <div class="info-item">
+                        <strong>Bathrooms:</strong> {{ apartment.bathrooms }}
+                    </div>
                 </div>
 
                 <div class="info-section">
                     <h2>Description</h2>
-                    <p>{{ apartment.description }}</p>
+                    <p class="description-text">{{ apartment.description }}</p>
                 </div>
 
                 <div class="info-section">
                     <h2>Amenities</h2>
                     <ul class="amenities-list">
                         {% for amenity in apartment.get_amenities_list %}
-                        <li>✓ {{ amenity }}</li>
+                        <li>{{ amenity }}</li>
                         {% endfor %}
                     </ul>
                 </div>
 
                 <div class="detail-actions">
                     {% if apartment.status == 'available' %}
-                    <a href="{% url 'reservation_create' %}?apartment={{ apartment.pk }}" class="btn btn-primary btn-lg">Book Now</a>
+                    <a href="{% url 'reservation_create' %}?apartment={{ apartment.pk }}" class="btn btn-primary btn-lg">Book This Apartment</a>
                     {% endif %}
+                    
                     {% if user.is_staff %}
-                    <a href="{% url 'apartment_update' apartment.pk %}" class="btn btn-secondary">Edit</a>
-                    <a href="{% url 'apartment_delete' apartment.pk %}" class="btn btn-danger">Delete</a>
+                    <div class="admin-actions">
+                        <a href="{% url 'apartment_update' apartment.pk %}" class="btn btn-secondary">Edit Details</a>
+                        <a href="{% url 'apartment_delete' apartment.pk %}" class="btn btn-danger">Delete</a>
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Layout Adjustments */
+.apartment-detail { 
+    background: white; 
+    border-radius: var(--radius-2xl); 
+    padding: 2rem; 
+    box-shadow: var(--shadow-md);
+    margin-top: 1rem;
+}
+
+.apartment-detail-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 2rem; 
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.header-main { display: flex; align-items: center; gap: 1rem; }
+
+/* Grid for Desktop */
+.apartment-detail-grid { 
+    display: grid; 
+    grid-template-columns: 1.2fr 1fr; 
+    gap: 3rem; 
+}
+
+/* Image & Placeholder */
+.apartment-detail-image img { 
+    width: 100%; 
+    border-radius: var(--radius-xl); 
+    object-fit: cover;
+    aspect-ratio: 4/3;
+}
+
+.apartment-placeholder-large {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: var(--gray-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-xl);
+    color: var(--gray-500);
+}
+
+/* Details */
+.info-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 1rem; 
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+}
+
+.price-large { font-size: 2.5rem; font-weight: 800; color: var(--primary); }
+.price-large span { font-size: 1rem; color: var(--gray-500); font-weight: 400; }
+
+.description-text { color: var(--gray-600); line-height: 1.8; }
+
+.amenities-list { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    list-style: none; 
+    gap: 0.5rem; 
+}
+
+.amenities-list li::before { content: "•"; color: var(--primary); font-weight: bold; margin-right: 8px; }
+
+/* Buttons */
+.detail-actions { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; }
+.admin-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+/* Responsive Media Queries */
+@media (max-width: 992px) {
+    .apartment-detail-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+@media (max-width: 768px) {
+    .apartment-detail { padding: 1rem; border-radius: 0; margin-top: 0; }
+    .apartment-detail-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+    .header-main { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    .price-large { font-size: 2rem; }
+    .info-grid { grid-template-columns: 1fr; }
+    .amenities-list { grid-template-columns: 1fr; }
+    .admin-actions { grid-template-columns: 1fr; }
+    .hide-mobile { display: none; }
+}
+</style>
 {% endblock %}
