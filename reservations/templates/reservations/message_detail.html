@@ -1,159 +1,218 @@
 {% extends 'base.html' %}
 
-{% block title %}Chat with {{ other_user.username }} - Apartment Reservation{% endblock %}
+{% block title %}Chat with {{ other_user.username }}{% endblock %}
 
 {% block content %}
-<div class="container chat-container">
-    <div class="conversation-header">
-        <a href="{% url 'inbox' %}" class="back-link">Back to Inbox</a>
-        <div class="header-info">
-            <div class="header-avatar">{{ other_user.username|slice:":1"|upper }}</div>
-            <div class="header-text">
-                <h2 class="header-name">{{ other_user.get_full_name|default:other_user.username }}</h2>
-                <p class="header-subject">Re: {{ conversation.subject }}</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="messages-thread" id="chatThread">
-        {% for message in messages %}
-        <div class="message-bubble {% if message.sender == user %}sent{% else %}received{% endif %}">
-            <div class="bubble-content">
-                <div class="bubble-text">
-                    {{ message.content|linebreaksbr }}
-                </div>
-                <div class="bubble-meta">
-                    <span class="bubble-time">{{ message.created_at|date:"g:i A" }}</span>
+<div class="chat-wrapper">
+    <div class="chat-container">
+        <div class="conversation-header">
+            <div class="header-left">
+                <a href="{% url 'inbox' %}" class="btn-back" title="Back to Inbox">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                </a>
+                <div class="header-user">
+                    <div class="header-avatar">{{ other_user.username|slice:":1"|upper }}</div>
+                    <div class="header-details">
+                        <h2 class="header-name">{{ other_user.get_full_name|default:other_user.username }}</h2>
+                        <span class="status-indicator">Online</span>
+                    </div>
                 </div>
             </div>
+            <div class="header-right mobile-hidden">
+                <span class="subject-tag">Re: {{ conversation.subject }}</span>
+            </div>
         </div>
-        {% endfor %}
-    </div>
 
-    <div class="reply-box">
-        <form method="POST" class="reply-form">
-            {% csrf_token %}
-            <textarea 
-                name="content" 
-                class="reply-input" 
-                rows="1" 
-                required 
-                placeholder="Write a message..."
-                oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
-            ></textarea>
-            <button type="submit" class="send-btn">Send</button>
-        </form>
+        <div class="messages-thread" id="chatThread">
+            <div class="date-divider"><span>Today</span></div>
+            
+            {% for message in messages %}
+            <div class="message-wrapper {% if message.sender == user %}sent{% else %}received{% endif %}">
+                <div class="message-bubble">
+                    <div class="bubble-content">
+                        {{ message.content|linebreaksbr }}
+                    </div>
+                    <div class="bubble-meta">
+                        {{ message.created_at|date:"g:i A" }}
+                        {% if message.sender == user %}
+                        <span class="read-receipt">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="reply-area">
+            <form method="POST" class="reply-form">
+                {% csrf_token %}
+                <div class="input-wrapper">
+                    <textarea 
+                        name="content" 
+                        class="reply-input" 
+                        rows="1" 
+                        required 
+                        placeholder="Type a message..."
+                        oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
+                    ></textarea>
+                </div>
+                <button type="submit" class="btn-send">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </form>
+        </div>
     </div>
 </div>
 
 <style>
-    .chat-container { max-width: 800px; margin: 1rem auto; display: flex; flex-direction: column; height: calc(100vh - 120px); }
-
-    /* Header */
-    .conversation-header {
-        background: white;
-        padding: 1rem 1.5rem;
-        border-radius: var(--radius-lg);
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-        border: 1px solid var(--gray-200);
+    /* --- Layout Structure --- */
+    .chat-wrapper {
+        height: calc(100vh - 100px);
+        max-width: 900px;
+        margin: 0 auto;
+        padding-bottom: 20px;
     }
 
-    .back-link { color: var(--primary); text-decoration: none; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; }
-
-    .header-info { display: flex; align-items: center; gap: 12px; }
-    .header-avatar {
-        width: 40px; height: 40px; border-radius: 50%; background: var(--dark);
-        color: white; display: flex; align-items: center; justify-content: center; font-weight: 800;
-    }
-
-    .header-name { font-size: 1.1rem; color: var(--dark); margin: 0; }
-    .header-subject { margin: 0; color: var(--gray-500); font-size: 0.8rem; }
-
-    /* Messages Thread */
-    .messages-thread {
-        flex: 1;
-        background: #f8fafc;
-        padding: 1.5rem;
-        border-radius: var(--radius-lg);
-        overflow-y: auto;
+    .chat-container {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        height: 100%;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
         border: 1px solid var(--gray-200);
+        overflow: hidden;
     }
 
-    .message-bubble { max-width: 80%; display: flex; flex-direction: column; }
-    .message-bubble.sent { align-self: flex-end; }
-    .message-bubble.received { align-self: flex-start; }
+    /* --- Professional Header --- */
+    .conversation-header {
+        padding: 12px 20px;
+        background: white;
+        border-bottom: 1px solid var(--gray-100);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 
-    .bubble-content { padding: 10px 14px; border-radius: 18px; position: relative; font-size: 0.95rem; line-height: 1.4; }
+    .header-left { display: flex; align-items: center; gap: 15px; }
+    
+    .btn-back {
+        color: var(--gray-500);
+        padding: 8px;
+        border-radius: 50%;
+        transition: 0.2s;
+        display: flex;
+    }
+    .btn-back:hover { background: var(--gray-100); color: var(--primary); }
 
-    .message-bubble.sent .bubble-content {
-        background: var(--primary);
-        color: white;
+    .header-user { display: flex; align-items: center; gap: 12px; }
+    
+    .header-avatar {
+        width: 42px; height: 42px; border-radius: 12px;
+        background: var(--primary); color: white;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 1.1rem;
+    }
+
+    .header-name { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin: 0; }
+    .status-indicator { font-size: 0.75rem; color: #10b981; display: flex; align-items: center; gap: 4px; }
+    .status-indicator::before { content: ''; width: 6px; height: 6px; background: #10b981; border-radius: 50%; }
+
+    .subject-tag {
+        font-size: 0.75rem; background: var(--gray-100);
+        color: var(--gray-600); padding: 4px 12px; border-radius: 20px; font-weight: 600;
+    }
+
+    /* --- Messaging Thread --- */
+    .messages-thread {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        background: #fdfdfd;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .date-divider {
+        text-align: center; margin: 10px 0; position: relative;
+    }
+    .date-divider span {
+        background: #fdfdfd; padding: 0 10px; font-size: 0.7rem;
+        color: var(--gray-400); font-weight: 700; text-transform: uppercase;
+        position: relative; z-index: 1;
+    }
+    .date-divider::after {
+        content: ''; position: absolute; left: 0; top: 50%; width: 100%;
+        height: 1px; background: var(--gray-100);
+    }
+
+    /* Message Bubbles */
+    .message-wrapper { display: flex; width: 100%; flex-direction: column; }
+    .message-wrapper.sent { align-items: flex-end; }
+    .message-wrapper.received { align-items: flex-start; }
+
+    .message-bubble {
+        max-width: 75%; padding: 10px 14px; border-radius: 18px;
+        position: relative; font-size: 0.95rem; line-height: 1.5;
+    }
+
+    .sent .message-bubble {
+        background: var(--primary); color: white;
         border-bottom-right-radius: 4px;
+        box-shadow: 0 4px 12px rgba(61, 64, 224, 0.2);
     }
 
-    .message-bubble.received .bubble-content {
-        background: white;
-        color: var(--dark);
+    .received .message-bubble {
+        background: var(--gray-100); color: var(--gray-800);
         border-bottom-left-radius: 4px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
-    .bubble-meta { font-size: 0.7rem; margin-top: 4px; opacity: 0.7; text-align: right; }
-    .message-bubble.sent .bubble-meta { color: white; }
+    .bubble-meta {
+        font-size: 0.65rem; margin-top: 4px; display: flex; 
+        align-items: center; gap: 4px; opacity: 0.8;
+    }
+    .sent .bubble-meta { justify-content: flex-end; color: white; }
 
-    /* Reply Box */
-    .reply-box {
+    /* --- Reply Box --- */
+    .reply-area {
+        padding: 15px 20px;
         background: white;
-        padding: 1rem;
-        border-radius: var(--radius-lg);
-        margin-top: 1rem;
-        border: 1px solid var(--gray-200);
-        box-shadow: var(--shadow-sm);
+        border-top: 1px solid var(--gray-100);
     }
 
-    .reply-form { display: flex; gap: 10px; align-items: flex-end; }
+    .reply-form { display: flex; gap: 12px; align-items: flex-end; }
+
+    .input-wrapper {
+        flex: 1; background: var(--gray-50); border-radius: 24px;
+        padding: 4px 16px; border: 1.5px solid var(--gray-200);
+        transition: 0.2s;
+    }
+    .input-wrapper:focus-within { border-color: var(--primary); background: white; }
 
     .reply-input {
-        flex: 1;
-        padding: 10px 15px;
-        border: 1px solid var(--gray-300);
-        border-radius: 20px;
-        font-size: 1rem;
-        resize: none;
-        max-height: 120px;
-        transition: border-color 0.2s;
+        width: 100%; border: none; background: transparent; padding: 10px 0;
+        font-size: 0.95rem; resize: none; max-height: 120px; color: var(--gray-800);
     }
+    .reply-input:focus { outline: none; }
 
-    .reply-input:focus { outline: none; border-color: var(--primary); }
-
-    .send-btn {
-        background: var(--primary);
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 20px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: background 0.2s;
+    .btn-send {
+        background: var(--primary); color: white; border: none;
+        width: 44px; height: 44px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; transition: 0.2s; flex-shrink: 0;
     }
+    .btn-send:hover { transform: scale(1.05); background: #2d30c0; }
 
-    .send-btn:hover { background: #1d4ed8; }
-
-    /* Mobile */
+    /* --- Mobile --- */
     @media (max-width: 768px) {
-        .chat-container { height: calc(100vh - 80px); margin: 0.5rem 0; }
-        .conversation-header { gap: 0.75rem; padding: 0.75rem; }
-        .back-link { font-size: 0.7rem; }
-        .header-avatar { width: 32px; height: 32px; font-size: 0.9rem; }
-        .messages-thread { padding: 1rem; }
-        .message-bubble { max-width: 90%; }
+        .chat-wrapper { height: calc(100vh - 70px); padding: 0; }
+        .chat-container { border-radius: 0; border: none; }
+        .mobile-hidden { display: none; }
+        .message-bubble { max-width: 85%; }
+        .conversation-header { padding: 10px 15px; }
     }
 </style>
 
@@ -161,6 +220,11 @@
     document.addEventListener('DOMContentLoaded', function() {
         const thread = document.getElementById('chatThread');
         thread.scrollTop = thread.scrollHeight;
+        
+        // Auto-focus on mobile sometimes causes issues, but good for desktop
+        if (window.innerWidth > 768) {
+            document.querySelector('.reply-input').focus();
+        }
     });
 </script>
 {% endblock %}
