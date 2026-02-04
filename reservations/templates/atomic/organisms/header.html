@@ -1,46 +1,99 @@
-<ul class="nav-menu">
-    <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
-    
-    {% if user.is_staff %}
-        <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
-    {% endif %}
-    
-    <li>
-        <a href="{% if not user.is_staff %}{% url 'my_apartment' %}{% else %}{% url 'apartment_list' %}{% endif %}" class="nav-link">
-            {% if not user.is_staff %}My Apartment{% else %}Apartments{% endif %}
-        </a>
-    </li>
-    
-    <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
+<div class="nav-content-layout">
+    <ul class="nav-links">
+        <li class="mobile-only-label">Main Menu</li>
+        <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+        {% if user.is_staff %}
+            <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
+        {% endif %}
+        <li>
+            <a href="{% if not user.is_staff %}{% url 'my_apartment' %}{% else %}{% url 'apartment_list' %}{% endif %}" class="nav-link">
+                {% if not user.is_staff %}My Apartment{% else %}Apartments{% endif %}
+            </a>
+        </li>
+        <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
+    </ul>
 
     <div class="nav-actions">
-        <a href="{% url 'inbox' %}" class="nav-icon-link">
-            ✉️ Messages
+        <a href="{% url 'inbox' %}" class="action-item message-link">
+            <span class="icon">✉️</span>
+            <span class="label">Messages</span>
             {% if unread_messages_count > 0 %}
-                <span class="badge">{{ unread_messages_count }}</span>
+                <span class="notif-badge">{{ unread_messages_count }}</span>
             {% endif %}
         </a>
         
-        <a href="{% url 'reservation_create' %}" class="btn btn-primary">Book Now</a>
+        <a href="{% url 'reservation_create' %}" class="btn-book">
+            <span class="plus-icon">+</span> Book Now
+        </a>
         
-        <div class="user-info">
-            <span class="username">{{ user.username }}</span>
-            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+        <div class="user-profile">
+            <div class="user-details">
+                <span class="username">@{{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="logout-link">Log out</a>
+            </div>
         </div>
     </div>
-</ul>
+</div>
 
 <style>
-    .nav-menu { display: flex; align-items: center; gap: 1rem; list-style: none; }
-    .nav-link { text-decoration: none; color: var(--gray-700); font-weight: 600; font-size: 0.95rem; }
-    .nav-actions { display: flex; align-items: center; gap: 1.5rem; margin-left: 1rem; }
-    .user-info { display: flex; flex-direction: column; line-height: 1.2; }
-    .logout-link { color: #ef4444; font-size: 0.8rem; text-decoration: none; font-weight: 700; }
-    .badge { background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; }
+    /* --- Shared Nav Styles --- */
+    .nav-content-layout { display: flex; align-items: center; width: 100%; gap: 2rem; }
+    .nav-links { display: flex; list-style: none; gap: 1.5rem; align-items: center; }
+    .nav-link { 
+        text-decoration: none; color: var(--gray-700); font-weight: 600; font-size: 0.9rem;
+        transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--primary); }
 
-    @media (max-width: 768px) {
-        .nav-menu { flex-direction: column; align-items: flex-start; gap: 2rem; }
-        .nav-actions { flex-direction: column; align-items: flex-start; margin-left: 0; width: 100%; }
-        .btn-primary { width: 100%; text-align: center; }
+    .nav-actions { display: flex; align-items: center; gap: 1.25rem; }
+
+    /* Action Item (Messages) */
+    .action-item { 
+        text-decoration: none; color: var(--gray-700); display: flex; 
+        align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem;
+        position: relative;
+    }
+
+    .notif-badge {
+        background: var(--danger); color: white; font-size: 0.65rem;
+        padding: 2px 6px; border-radius: 20px; font-weight: 800;
+    }
+
+    /* Professional Button */
+    .btn-book {
+        background: var(--primary); color: white; text-decoration: none;
+        padding: 0.6rem 1.2rem; border-radius: 10px; font-weight: 700;
+        font-size: 0.9rem; transition: 0.2s; display: flex; align-items: center; gap: 6px;
+    }
+    .btn-book:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+    /* User Styles */
+    .user-profile { border-left: 1px solid var(--gray-200); padding-left: 1.25rem; }
+    .user-details { display: flex; flex-direction: column; line-height: 1.2; }
+    .username { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
+    .logout-link { font-size: 0.75rem; color: var(--danger); text-decoration: none; font-weight: 600; }
+
+    .mobile-only-label { display: none; }
+
+    /* --- Mobile Professional Overrides --- */
+    @media (max-width: 991px) {
+        .nav-content-layout { flex-direction: column; align-items: flex-start; gap: 2.5rem; }
+        .nav-links { flex-direction: column; align-items: flex-start; width: 100%; }
+        .mobile-only-label { 
+            display: block; font-size: 0.7rem; text-transform: uppercase; 
+            letter-spacing: 1px; color: var(--gray-400); font-weight: 800; margin-bottom: 0.5rem;
+        }
+        
+        .nav-link { font-size: 1.1rem; width: 100%; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100); }
+        
+        .nav-actions { flex-direction: column; width: 100%; align-items: flex-start; gap: 1.5rem; }
+        
+        .action-item { width: 100%; padding: 0.75rem; background: var(--gray-50); border-radius: 12px; }
+        
+        .btn-book { width: 100%; justify-content: center; padding: 1rem; font-size: 1rem; }
+        
+        .user-profile { border-left: none; padding-left: 0; width: 100%; padding-top: 1.5rem; border-top: 1px solid var(--gray-100); }
+        .username { font-size: 1rem; }
+        .logout-link { font-size: 0.9rem; margin-top: 4px; }
     }
 </style>
