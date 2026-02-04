@@ -1,44 +1,48 @@
 <nav class="navbar">
-    <div class="container nav-container">
-        <div class="nav-top-bar">
-            <div class="nav-brand">
-                <a href="{% url 'dashboard' %}" class="brand-link">
-                    <h2>Apartment Res</h2>
-                </a>
-                {% if user.is_staff %}
-                <span class="admin-badge">Admin</span>
-                {% endif %}
-            </div>
-
-            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
-                <span class="hamburger"></span>
-            </button>
+    <div class="container nav-wrapper">
+        <div class="brand-section">
+            <a href="{% url 'dashboard' %}" class="logo">
+                <h2>Apartment Res</h2>
+            </a>
+            {% if user.is_staff %}
+                <span class="admin-label">Admin</span>
+            {% endif %}
         </div>
 
-        <div class="nav-drawer" id="nav-drawer">
-            <ul class="nav-menu">
-                <li class="menu-label">Navigation</li>
-                <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
-                {% if user.is_staff %}
-                <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
-                {% endif %}
-                <li><a href="{% url 'apartment_list' %}" class="nav-link">Apartments</a></li>
-                <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
-                
-                <hr class="nav-divider">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open Menu">
+            <span class="hamburger-line"></span>
+        </button>
 
-                <li class="nav-icons">
-                    <a href="{% url 'inbox' %}" class="nav-icon-link">
-                        <span>✉️ Messages</span>
-                        {% if unread_messages_count > 0 %}
-                        <span class="count-badge">{{ unread_messages_count }}</span>
-                        {% endif %}
+        <div class="nav-sidebar" id="nav-sidebar">
+            <ul class="menu-list">
+                <li class="sidebar-header">Main Menu</li>
+                <li><a href="{% url 'dashboard' %}" class="menu-item">Dashboard</a></li>
+                
+                {% if user.is_staff %}
+                    <li><a href="{% url 'admin_dashboard' %}" class="menu-item">Admin Panel</a></li>
+                {% endif %}
+                
+                <li>
+                    <a href="{% if not user.is_staff %}{% url 'my_apartment' %}{% else %}{% url 'apartment_list' %}{% endif %}" class="menu-item">
+                        {% if not user.is_staff %}My Apartment{% else %}Apartments{% endif %}
                     </a>
                 </li>
+                
+                <li><a href="{% url 'reservation_list' %}" class="menu-item">Reservations</a></li>
 
-                <div class="drawer-footer">
-                    <a href="{% url 'reservation_create' %}" class="btn btn-primary btn-full">Book Now</a>
-                    <div class="user-meta">
+                <hr class="sidebar-divider">
+
+                <div class="action-group">
+                    <a href="{% url 'inbox' %}" class="icon-link">
+                        <span>✉️ Messages</span>
+                        {% if unread_messages_count > 0 %}
+                            <span class="count-badge">{{ unread_messages_count }}</span>
+                        {% endif %}
+                    </a>
+                    
+                    <a href="{% url 'reservation_create' %}" class="btn btn-primary full-width">Book Now</a>
+                    
+                    <div class="user-footer">
                         <span class="username">{{ user.username }}</span>
                         <a href="{% url 'logout' %}" class="logout-link">Logout</a>
                     </div>
@@ -48,105 +52,107 @@
     </div>
 </nav>
 
-<div class="nav-overlay" id="nav-overlay"></div>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <script>
-    const menuBtn = document.getElementById('menu-toggle');
-    const drawer = document.getElementById('nav-drawer');
-    const overlay = document.getElementById('nav-overlay');
+    const toggle = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('nav-sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
 
     function toggleMenu() {
-        drawer.classList.toggle('active');
+        sidebar.classList.toggle('active');
         overlay.classList.toggle('active');
-        // Prevent background scrolling when menu is open
-        document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
+        document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : 'auto';
     }
 
-    menuBtn.addEventListener('click', toggleMenu);
+    toggle.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', toggleMenu);
 </script>
 
 <style>
-/* --- Core Navbar --- */
+/* --- Base Header --- */
 .navbar {
     background: #ffffff;
-    padding: 0.75rem 0;
+    padding: 0.85rem 0;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: sticky;
     top: 0;
     z-index: 1000;
 }
 
-/* Force Logo and Hamburger to opposite sides */
-.nav-top-bar {
+.nav-wrapper {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Force brand left, hamburger right */
     align-items: center;
-    width: 100%;
 }
 
-.nav-brand { display: flex; align-items: center; gap: 8px; }
-.brand-link { text-decoration: none; color: #111827; }
-.brand-link h2 { margin: 0; font-size: 1.15rem; font-weight: 800; white-space: nowrap; }
+.brand-section { display: flex; align-items: center; gap: 8px; }
+.logo { text-decoration: none; color: #111827; }
+.logo h2 { margin: 0; font-size: 1.15rem; font-weight: 800; }
 
-.admin-badge {
+.admin-label {
     background: #fff7ed; color: #c2410c; padding: 2px 6px; 
     border-radius: 4px; font-size: 0.65rem; font-weight: 800;
 }
 
 /* --- Hamburger Style --- */
 .menu-toggle {
-    background: none; border: none; cursor: pointer; padding: 10px; z-index: 2100;
+    display: block; background: none; border: none; cursor: pointer; padding: 10px; z-index: 2100;
 }
-.hamburger, .hamburger::before, .hamburger::after {
-    content: ''; display: block; width: 22px; height: 2px; background: #111827; transition: 0.3s;
+.hamburger-line, .hamburger-line::before, .hamburger-line::after {
+    content: ''; display: block; width: 22px; height: 2px;
+    background: #111827; position: relative; transition: 0.3s;
 }
-.hamburger { position: relative; }
-.hamburger::before { position: absolute; top: -7px; left: 0; }
-.hamburger::after { position: absolute; bottom: 7px; left: 0; }
+.hamburger-line::before { position: absolute; top: -7px; left: 0; }
+.hamburger-line::after { position: absolute; bottom: 7px; left: 0; }
 
-/* --- Mobile Drawer (The Fix) --- */
-.nav-drawer {
+/* --- Sidebar Drawer (Hidden by default) --- */
+.nav-sidebar {
     position: fixed;
     top: 0;
-    right: -100%; /* Hidden off-screen */
+    right: -100%; /* Off-screen */
     width: 280px;
     height: 100vh;
     background: #ffffff;
     z-index: 2000;
-    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding: 5rem 1.5rem 2rem;
+    transition: right 0.3s ease;
     box-shadow: -10px 0 30px rgba(0,0,0,0.1);
 }
 
-.nav-drawer.active { right: 0; } /* Slide in */
+.nav-sidebar.active { right: 0; }
 
-.nav-menu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem; }
-.menu-label { font-size: 0.7rem; text-transform: uppercase; color: #9ca3af; font-weight: 800; }
-.nav-link { text-decoration: none; color: #374151; font-weight: 600; font-size: 1rem; }
-.nav-divider { border: 0; border-top: 1px solid #f3f4f6; margin: 0.5rem 0; }
+.menu-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.25rem; }
+.sidebar-header { font-size: 0.75rem; text-transform: uppercase; color: #9ca3af; font-weight: 800; }
+.menu-item { text-decoration: none; color: #374151; font-weight: 600; font-size: 1rem; }
+.sidebar-divider { border: none; border-top: 1px solid #f3f4f6; margin: 0.5rem 0; }
 
-.drawer-footer { margin-top: auto; padding-top: 1.5rem; border-top: 1px solid #f3f4f6; }
-.btn-full { width: 100%; display: block; text-align: center; margin-bottom: 1rem; }
-.logout-link { color: #ef4444; text-decoration: none; font-size: 0.8rem; font-weight: 700; }
+.action-group { margin-top: auto; display: flex; flex-direction: column; gap: 1.5rem; }
+.icon-link { text-decoration: none; color: #374151; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+.full-width { width: 100%; text-align: center; }
+
+.user-footer { border-top: 1px solid #f3f4f6; padding-top: 1.5rem; display: flex; flex-direction: column; }
+.username { font-weight: 800; color: #111827; }
+.logout-link { color: #ef4444; text-decoration: none; font-size: 0.85rem; font-weight: 700; margin-top: 4px; }
 
 /* --- Overlay --- */
-.nav-overlay {
+.sidebar-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.4); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s;
 }
-.nav-overlay.active { opacity: 1; pointer-events: auto; }
+.sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-/* --- Desktop Styles (992px and up) --- */
+/* --- Desktop Logic (Return to horizontal bar) --- */
 @media (min-width: 992px) {
     .menu-toggle { display: none; }
-    .nav-drawer {
+    .nav-sidebar {
         position: static; width: auto; height: auto; background: none; 
         box-shadow: none; right: 0; padding: 0; transition: none;
     }
-    .nav-menu { flex-direction: row; align-items: center; gap: 1.5rem; }
-    .menu-label, .nav-divider, .drawer-footer hr { display: none; }
-    .drawer-footer { border: none; padding: 0; display: flex; align-items: center; gap: 1rem; }
-    .btn-full { width: auto; margin-bottom: 0; }
+    .menu-list { flex-direction: row; align-items: center; gap: 1.5rem; }
+    .sidebar-header, .sidebar-divider, .user-footer .username { display: none; }
+    .action-group { flex-direction: row; margin: 0; align-items: center; }
+    .user-footer { border: none; padding: 0; }
+    .full-width { width: auto; }
 }
 </style>
