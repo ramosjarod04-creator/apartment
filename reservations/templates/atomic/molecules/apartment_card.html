@@ -1,35 +1,132 @@
-<div class="apartment-card {% if apartment.status == 'occupied' %}is-occupied{% endif %}">
-    <div class="image-wrapper">
-        {% if apartment.status == 'occupied' %}
-            <div class="occupied-watermark">OCCUPIED</div>
-        {% endif %}
+<div class="apt-card {% if apartment.status == 'occupied' %}is-occupied{% endif %}">
+    <div class="apt-image-box">
+        <div class="apt-status-badge">
+            {% if apartment.status == 'occupied' %}
+                <span class="status-dot"></span> Occupied
+            {% else %}
+                <span class="status-dot available"></span> Available
+            {% endif %}
+        </div>
         
         {% if apartment.image %}
-            <img src="{{ apartment.image.url }}" alt="Unit {{ apartment.unit_number }}">
+            <img src="{{ apartment.image.url }}" alt="Unit {{ apartment.unit_number }}" class="apt-img">
         {% else %}
-            <div class="placeholder">🏢</div>
+            <div class="apt-placeholder">
+                <span class="placeholder-icon">Unit {{ apartment.unit_number }}</span>
+            </div>
         {% endif %}
+
+        <div class="apt-price-overlay">
+            ₱{{ apartment.price_per_month|floatformat:0 }}<small>/mo</small>
+        </div>
     </div>
 
-    <div class="card-details">
-        <h2 class="room-title">Unit {{ apartment.unit_number }}</h2>
-        <p class="compound-subtitle">{{ apartment.name }}</p>
-        
-        <div class="price-tag">₱{{ apartment.price_per_month|floatformat:2 }}/mo</div>
+    <div class="apt-body">
+        <div class="apt-header">
+            <div>
+                <h3 class="apt-title">Unit {{ apartment.unit_number }}</h3>
+                <p class="apt-location">{{ apartment.name }}</p>
+            </div>
+            <span class="apt-type-tag">{{ apartment.get_apartment_type_display }}</span>
+        </div>
+
+        <div class="apt-specs">
+            <div class="spec-item" title="Bedrooms">
+                <span class="spec-label">BR</span>
+                <span class="spec-val">{{ apartment.bedrooms }}</span>
+            </div>
+            <div class="spec-item" title="Bathrooms">
+                <span class="spec-label">BA</span>
+                <span class="spec-val">{{ apartment.bathrooms }}</span>
+            </div>
+            <div class="spec-item" title="Area">
+                <span class="spec-label">SQM</span>
+                <span class="spec-val">{{ apartment.size_sqm }}</span>
+            </div>
+        </div>
+
+        <div class="apt-actions">
+            <a href="{% url 'apartment_detail' apartment.pk %}" class="btn btn-outline btn-sm full-btn">
+                View Details
+            </a>
+            {% if apartment.status != 'occupied' %}
+            <a href="{% url 'reservation_create' %}?apartment={{ apartment.pk }}" class="btn btn-primary btn-sm">
+                Book
+            </a>
+            {% endif %}
+        </div>
     </div>
 </div>
-    <div class="apartment-details">
-        <h3>{{ apartment.name }}</h3>
-        <p class="apartment-unit">Unit {{ apartment.unit_number }} • Floor {{ apartment.floor }}</p>
-        <div class="apartment-features">
-            <span>🛏️ {{ apartment.bedrooms }} BR</span>
-            <span>🚿 {{ apartment.bathrooms }} BA</span>
-            <span>📐 {{ apartment.size_sqm }} m²</span>
-        </div>
-        <p class="apartment-type">{{ apartment.get_apartment_type_display }}</p>
-        <div class="apartment-footer">
-            <p class="apartment-price">₱{{ apartment.price_per_month|floatformat:2 }}<span>/month</span></p>
-            <a href="{% url 'apartment_detail' apartment.pk %}" class="btn btn-primary btn-sm">View Details</a>
-        </div>
-    </div>
-</div>
+
+<style>
+    .apt-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        overflow: hidden;
+        transition: transform 0.2s, box-shadow 0.2s;
+        display: flex;
+        flex-direction: column;
+    }
+    .apt-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    /* Image Section */
+    .apt-image-box {
+        position: relative;
+        height: 200px;
+        background: var(--gray-100);
+    }
+    .apt-img { width: 100%; height: 100%; object-fit: cover; }
+    
+    .apt-status-badge {
+        position: absolute; top: 12px; left: 12px;
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(4px);
+        padding: 4px 10px; border-radius: 20px;
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+        display: flex; align-items: center; gap: 6px; z-index: 2;
+    }
+    .status-dot { width: 8px; height: 8px; background: var(--gray-400); border-radius: 50%; }
+    .status-dot.available { background: #10b981; }
+
+    .apt-price-overlay {
+        position: absolute; bottom: 12px; right: 12px;
+        background: var(--dark); color: white;
+        padding: 6px 12px; border-radius: var(--radius-md);
+        font-weight: 800; font-size: 1rem;
+    }
+    .apt-price-overlay small { font-size: 0.7rem; opacity: 0.8; font-weight: 400; }
+
+    /* Content Section */
+    .apt-body { padding: 1.25rem; flex-grow: 1; display: flex; flex-direction: column; }
+    
+    .apt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .apt-title { font-size: 1.1rem; margin: 0; color: var(--dark); font-weight: 800; }
+    .apt-location { font-size: 0.85rem; color: var(--gray-500); margin: 2px 0 0 0; }
+    
+    .apt-type-tag {
+        font-size: 0.65rem; background: var(--gray-100); color: var(--gray-600);
+        padding: 2px 8px; border-radius: 4px; font-weight: 700; text-transform: uppercase;
+    }
+
+    /* Specs Grid */
+    .apt-specs {
+        display: flex; gap: 12px; margin-bottom: 1.5rem;
+        padding: 10px 0; border-top: 1px solid var(--gray-50); border-bottom: 1px solid var(--gray-50);
+    }
+    .spec-item { display: flex; flex-direction: column; }
+    .spec-label { font-size: 0.65rem; color: var(--gray-400); font-weight: 700; text-transform: uppercase; }
+    .spec-val { font-size: 0.95rem; font-weight: 800; color: var(--dark); }
+
+    /* Actions */
+    .apt-actions { margin-top: auto; display: flex; gap: 8px; }
+    .full-btn { flex-grow: 1; }
+
+    /* Occupied State Styling */
+    .is-occupied { opacity: 0.85; }
+    .is-occupied .apt-image-box { filter: grayscale(0.5); }
+    .is-occupied .apt-price-overlay { background: var(--gray-500); }
+</style>
