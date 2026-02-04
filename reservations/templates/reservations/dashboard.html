@@ -5,39 +5,35 @@
 {% block content %}
 <div class="container dashboard">
     <div class="page-header">
-        <div>
+        <div class="header-text">
             <h1 class="main-title">Dashboard</h1>
-            <p class="subtitle">Welcome back, {{ user.first_name|default:user.username }}! Here's your overview.</p>
+            <p class="subtitle">Welcome back, {{ user.first_name|default:user.username }}!</p>
         </div>
         <div class="header-actions">
-            <a href="{% url 'reservation_create' %}" class="btn-primary-style">+ New Booking</a>
+            <a href="{% url 'reservation_create' %}" class="btn-primary-style mobile-full-width">+ New Booking</a>
         </div>
     </div>
 
     <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon primary"></div>
+        <div class="stat-card primary-border">
             <div class="stat-info">
                 <span class="stat-label">Total Units</span>
                 <h3 class="stat-value">{{ total_apartments }}</h3>
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon success"></div>
+        <div class="stat-card success-border">
             <div class="stat-info">
                 <span class="stat-label">Available</span>
                 <h3 class="stat-value">{{ available_apartments }}</h3>
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon warning"></div>
+        <div class="stat-card warning-border">
             <div class="stat-info">
                 <span class="stat-label">Pending</span>
                 <h3 class="stat-value">{{ pending_reservations }}</h3>
             </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-icon info"></div>
+        <div class="stat-card info-border">
             <div class="stat-info">
                 <span class="stat-label">Approved</span>
                 <h3 class="stat-value">{{ approved_reservations }}</h3>
@@ -49,7 +45,7 @@
         <div class="dashboard-column shadow-card">
             <div class="column-header">
                 <h2>Recent Reservations</h2>
-                <a href="{% url 'reservation_list' %}" class="link-action">View All →</a>
+                <a href="{% url 'reservation_list' %}" class="link-action">View All Details</a>
             </div>
 
             {% if recent_reservations %}
@@ -57,7 +53,7 @@
                 <div class="activity-feed">
                     {% for reservation in recent_reservations %}
                     <div class="activity-item">
-                        <div class="activity-icon {{ reservation.status }}"></div>
+                        <div class="activity-status-indicator {{ reservation.status }}"></div>
                         <div class="activity-content">
                             <p><strong>Unit {{ reservation.apartment.unit_number }}</strong> reserved by {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
                             <span class="activity-time">{{ reservation.created_at|date:"M d, Y" }}</span>
@@ -77,7 +73,7 @@
         <div class="dashboard-column shadow-card">
             <div class="column-header">
                 <h2>Featured Units</h2>
-                <a href="{% url 'apartment_list' %}" class="link-action">Browse All →</a>
+                <a href="{% url 'apartment_list' %}" class="link-action">Browse All</a>
             </div>
 
             <div class="mini-unit-list">
@@ -86,7 +82,9 @@
                     {% if apartment.image %}
                     <img src="{{ apartment.image.url }}" alt="Unit">
                     {% else %}
-                    <div class="mini-img-placeholder"></div>
+                    <div class="mini-img-placeholder">
+                        <small>No Image</small>
+                    </div>
                     {% endif %}
                     <div class="mini-unit-details">
                         <span class="unit-code">Unit {{ apartment.unit_number }}</span>
@@ -100,7 +98,6 @@
 </div>
 
 <style>
-    /* Consistent Color Palette */
     :root {
         --primary: #2563eb;
         --success: #10b981;
@@ -113,6 +110,7 @@
         --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
+    .dashboard { padding: 1.5rem 0; }
     .main-title { font-size: 2rem; color: var(--dark); font-weight: 800; }
     .subtitle { color: var(--gray-text); margin-top: 4px; }
 
@@ -120,7 +118,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 2.5rem;
+        margin-bottom: 2rem;
+        gap: 1rem;
     }
 
     .btn-primary-style {
@@ -130,59 +129,48 @@
         border-radius: 10px;
         font-weight: 600;
         text-decoration: none;
-        transition: transform 0.2s;
+        transition: all 0.2s;
+        display: inline-block;
+        text-align: center;
     }
 
-    .btn-primary-style:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
+    .btn-primary-style:hover { background-color: #1d4ed8; transform: translateY(-2px); }
 
     /* STATS GRID */
     .stats-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 3rem;
+        gap: 1rem;
+        margin-bottom: 2rem;
     }
 
     .stat-card {
         background: var(--white);
-        padding: 20px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        border: 1px solid var(--border);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border-left: 5px solid var(--border);
         box-shadow: var(--shadow);
     }
 
-    .stat-icon {
-        width: 48px;
-        height: 48px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-    }
+    .stat-card.primary-border { border-left-color: var(--primary); }
+    .stat-card.success-border { border-left-color: var(--success); }
+    .stat-card.warning-border { border-left-color: var(--warning); }
+    .stat-card.info-border { border-left-color: var(--info); }
 
-    .stat-icon.primary { background: #eff6ff; }
-    .stat-icon.success { background: #ecfdf5; }
-    .stat-icon.warning { background: #fffbeb; }
-    .stat-icon.info { background: #f0f9ff; }
-
-    .stat-label { font-size: 0.875rem; color: var(--gray-text); font-weight: 500; }
-    .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--dark); margin: 0; }
+    .stat-label { font-size: 0.8rem; color: var(--gray-text); font-weight: 700; text-transform: uppercase; }
+    .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--dark); margin-top: 5px; }
 
     /* LAYOUT GRID */
     .dashboard-main-grid {
         display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 2rem;
+        grid-template-columns: 1.5fr 1fr;
+        gap: 1.5rem;
     }
 
     .shadow-card {
         background: var(--white);
         border-radius: 16px;
-        padding: 24px;
+        padding: 1.5rem;
         border: 1px solid var(--border);
     }
 
@@ -190,126 +178,77 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 20px;
+        margin-bottom: 1.5rem;
     }
 
-    .link-action { text-decoration: none; color: var(--primary); font-weight: 600; font-size: 0.9rem; }
+    .column-header h2 { font-size: 1.25rem; font-weight: 700; }
+    .link-action { text-decoration: none; color: var(--primary); font-weight: 600; font-size: 0.85rem; }
 
-    /* ACTIVITY FEED - SCROLLABLE (Shows exactly 3 items) */
-    .activity-feed-container {
-        max-height: 280px;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding-right: 8px;
-    }
-
-    /* Custom Scrollbar */
-    .activity-feed-container::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .activity-feed-container::-webkit-scrollbar-track {
-        background: #f1f5f9;
-        border-radius: 10px;
-    }
-
-    .activity-feed-container::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 10px;
-    }
-
-    .activity-feed-container::-webkit-scrollbar-thumb:hover {
-        background: #94a3b8;
-    }
-
-    .activity-feed { 
-        display: flex; 
-        flex-direction: column; 
-        gap: 12px; 
-    }
-
+    /* ACTIVITY FEED */
+    .activity-feed-container { max-height: 400px; overflow-y: auto; padding-right: 5px; }
     .activity-item {
         display: flex;
         align-items: center;
-        padding: 12px;
-        border-radius: 12px;
+        padding: 1rem;
+        border-radius: 10px;
         background: #f8fafc;
         gap: 12px;
-        transition: background 0.2s;
+        margin-bottom: 0.75rem;
     }
 
-    .activity-item:hover {
-        background: #f1f5f9;
-    }
+    .activity-status-indicator { width: 4px; height: 30px; border-radius: 2px; flex-shrink: 0; }
+    .activity-status-indicator.pending { background: var(--warning); }
+    .activity-status-indicator.approved { background: var(--success); }
+    .activity-status-indicator.denied { background: #ef4444; }
 
-    .activity-icon { 
-        width: 10px; 
-        height: 10px; 
-        border-radius: 50%; 
-        flex-shrink: 0;
-    }
-    .activity-icon.pending { background: var(--warning); }
-    .activity-icon.approved { background: var(--success); }
-    .activity-icon.denied { background: #ef4444; }
-    .activity-icon.cancelled { background: #6b7280; }
-
-    .activity-content { flex: 1; min-width: 0; }
-    .activity-content p { margin: 0; font-size: 0.95rem; color: var(--dark); }
-    .activity-time { font-size: 0.8rem; color: var(--gray-text); display: block; margin-top: 2px; }
+    .activity-content { flex: 1; }
+    .activity-content p { margin: 0; font-size: 0.9rem; color: var(--dark); line-height: 1.4; }
+    .activity-time { font-size: 0.75rem; color: var(--gray-text); }
 
     /* MINI UNITS */
-    .mini-unit-list { display: flex; flex-direction: column; gap: 12px; }
+    .mini-unit-list { display: flex; flex-direction: column; gap: 10px; }
     .mini-unit-item {
         display: flex;
         align-items: center;
         gap: 12px;
         text-decoration: none;
-        padding: 8px;
-        border-radius: 8px;
-        transition: background 0.2s;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        transition: 0.2s;
     }
-    .mini-unit-item:hover { background: #f1f5f9; }
+    .mini-unit-item:hover { border-color: var(--primary); background: #f0f7ff; }
 
     .mini-unit-item img, .mini-img-placeholder {
-        width: 50px;
-        height: 50px;
-        border-radius: 8px;
-        object-fit: cover;
+        width: 60px; height: 60px; border-radius: 8px; object-fit: cover;
     }
 
     .mini-img-placeholder { 
-        background: #e2e8f0; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        font-size: 1.5rem;
+        background: #f1f5f9; display: flex; align-items: center; justify-content: center; 
+        color: var(--gray-text); font-size: 0.65rem; text-align: center; font-weight: 700;
     }
-    .unit-code { display: block; font-weight: 600; color: var(--dark); }
-    .unit-price { font-size: 0.85rem; color: var(--primary); font-weight: 500; }
 
-    /* STATUS BADGES */
+    .unit-code { display: block; font-weight: 700; color: var(--dark); font-size: 0.95rem; }
+    .unit-price { font-size: 0.85rem; color: var(--primary); font-weight: 600; }
+
+    /* BADGES */
     .badge-status {
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        white-space: nowrap;
-        flex-shrink: 0;
+        padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
     }
     .badge-status.pending { background: #fff7ed; color: #9a3412; }
     .badge-status.approved { background: #f0fdf4; color: #166534; }
-    .badge-status.denied { background: #fef2f2; color: #991b1b; }
-    .badge-status.cancelled { background: #f3f4f6; color: #374151; }
 
-    .empty-placeholder {
-        text-align: center;
-        padding: 2rem;
-        color: var(--gray-text);
-    }
-
+    /* RESPONSIVE */
     @media (max-width: 992px) {
         .dashboard-main-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+        .page-header { flex-direction: column; align-items: stretch; }
+        .mobile-full-width { width: 100%; }
+        .activity-item { flex-wrap: wrap; }
+        .badge-status { order: 3; width: 100%; text-align: center; margin-top: 5px; }
+        .activity-content { order: 2; }
     }
 </style>
 {% endblock %}
