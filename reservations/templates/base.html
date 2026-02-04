@@ -6,93 +6,106 @@
     <title>{% block title %}Apartment Reservation{% endblock %}</title>
     
     <style>
-        /* Base Variables and Layout */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* CSS Variables */
         :root {
             --primary: rgb(61, 64, 224);
+            --primary-hover: rgb(45, 48, 200);
             --white: #ffffff;
             --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
             --gray-700: #374151;
             --gray-900: #111827;
+            --danger: #ef4444;
             --radius-lg: 0.75rem;
-            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--gray-50);
             color: var(--gray-900);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            line-height: 1.5;
         }
 
-        .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
-        .main-content { flex: 1; padding: 1.5rem 0; }
-
-        /* --- Updated Navbar --- */
+        /* --- Navbar Layout --- */
         .navbar {
             background-color: var(--white);
-            box-shadow: var(--shadow-md);
-            padding: 1rem 0;
+            padding: 0.75rem 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
         .navbar .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.25rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        /* Hamburger Toggle */
+        .nav-brand h2 { 
+            font-size: 1.25rem; 
+            font-weight: 800; 
+            color: var(--gray-900);
+            letter-spacing: -0.5px;
+        }
+
+        /* --- Hamburger Button --- */
         .menu-toggle {
             display: none;
-            background: none;
+            background: var(--gray-100);
             border: none;
             cursor: pointer;
-            padding: 5px;
+            padding: 10px;
+            border-radius: 8px;
             z-index: 1100;
         }
 
         .hamburger-bar, .hamburger-bar::before, .hamburger-bar::after {
-            content: ''; display: block; width: 22px; height: 2px;
+            content: ''; display: block; width: 20px; height: 2px;
             background: var(--gray-900); transition: 0.3s; position: relative;
         }
-        .hamburger-bar::before { position: absolute; top: -7px; }
-        .hamburger-bar::after { position: absolute; bottom: -7px; }
+        .hamburger-bar::before { position: absolute; top: -6px; }
+        .hamburger-bar::after { position: absolute; bottom: -6px; }
 
-        /* --- Mobile Drawer Drawer Logic --- */
-        @media (max-width: 768px) {
+        /* --- Mobile Sidebar Overlay --- */
+        .nav-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(17, 24, 39, 0.4); backdrop-filter: blur(4px);
+            z-index: 1040; opacity: 0; visibility: hidden; transition: 0.3s;
+        }
+        .nav-overlay.active { opacity: 1; visibility: visible; }
+
+        /* --- Sidebar Drawer --- */
+        @media (max-width: 991px) {
             .menu-toggle { display: block; }
             
             .nav-drawer-wrapper {
                 position: fixed;
                 top: 0;
-                right: -100%; /* Hidden off-screen */
-                width: 280px;
+                right: -100%;
+                width: 300px;
                 height: 100vh;
                 background: var(--white);
                 z-index: 1050;
-                transition: right 0.3s ease;
-                padding: 4rem 1.5rem;
-                box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+                transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: var(--shadow-lg);
+                padding: 1.5rem;
+                display: flex;
+                flex-direction: column;
             }
 
-            .nav-drawer-wrapper.active { right: 0; } /* Slide in */
-
-            .nav-overlay {
-                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-                background: rgba(0,0,0,0.4); z-index: 1040;
-                display: none;
-            }
-            .nav-overlay.active { display: block; }
+            .nav-drawer-wrapper.active { transform: translateX(-100%); }
         }
 
-        @media (min-width: 769px) {
-            .nav-drawer-wrapper { display: block; }
+        @media (min-width: 992px) {
+            .nav-drawer-wrapper { display: flex; align-items: center; flex: 1; justify-content: flex-end; }
         }
     </style>
 </head>
@@ -100,7 +113,7 @@
     <header class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <a href="/" style="text-decoration: none; color: inherit;">
+                <a href="/" style="text-decoration: none;">
                     <h2>Apartments</h2>
                 </a>
             </div>
@@ -129,12 +142,13 @@
         const drawer = document.getElementById('nav-drawer-wrapper');
         const overlay = document.getElementById('nav-overlay');
 
+        function toggleMenu() {
+            drawer.classList.toggle('active');
+            overlay.classList.toggle('active');
+            document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
+        }
+
         if (toggle) {
-            function toggleMenu() {
-                drawer.classList.toggle('active');
-                overlay.classList.toggle('active');
-                document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
-            }
             toggle.addEventListener('click', toggleMenu);
             overlay.addEventListener('click', toggleMenu);
         }
