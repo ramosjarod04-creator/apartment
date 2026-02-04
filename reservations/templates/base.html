@@ -15,6 +15,7 @@
             --gray-700: #374151;
             --gray-900: #111827;
             --danger: #ef4444;
+            --danger-light: #fee2e2;
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
@@ -59,32 +60,26 @@
         .hamburger-bar::before { position: absolute; top: -6px; }
         .hamburger-bar::after { position: absolute; bottom: -6px; }
 
-        /* --- Updated Right Sidebar Logic --- */
         @media (max-width: 991px) {
             .menu-toggle { display: block; }
-            
             .nav-drawer-wrapper {
                 position: fixed;
                 top: 0;
-                right: 0; /* Anchor to right */
+                right: 0;
                 width: 85%;
                 max-width: 300px;
                 height: 100vh;
                 background: var(--white);
                 z-index: 1050;
-                /* Start hidden completely off-screen to the right */
                 transform: translateX(100%); 
                 transition: transform 0.3s ease-in-out;
                 box-shadow: var(--shadow-lg);
                 padding: 2rem 1.5rem;
                 overflow-y: auto;
+                display: flex;
+                flex-direction: column;
             }
-
-            /* Slide in from the right to its original position (0) */
-            .nav-drawer-wrapper.active { 
-                transform: translateX(0); 
-            }
-
+            .nav-drawer-wrapper.active { transform: translateX(0); }
             .nav-overlay {
                 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
                 background: rgba(17, 24, 39, 0.5); 
@@ -102,15 +97,9 @@
 <body>
     <header class="navbar">
         <div class="container">
-            <div class="nav-brand">
-                <a href="/"><h2>Apartments</h2></a>
-            </div>
-
+            <div class="nav-brand"><a href="/"><h2>Apartments</h2></a></div>
             {% if user.is_authenticated %}
-                <button class="menu-toggle" id="menu-toggle">
-                    <span class="hamburger-bar"></span>
-                </button>
-
+                <button class="menu-toggle" id="menu-toggle"><span class="hamburger-bar"></span></button>
                 <div class="nav-drawer-wrapper" id="nav-drawer-wrapper">
                     {% include 'atomic/organisms/header.html' %}
                 </div>
@@ -118,24 +107,16 @@
             {% endif %}
         </div>
     </header>
-
-    <main class="main-content">
-        <div class="container">
-            {% block content %}{% endblock %}
-        </div>
-    </main>
-
+    <main class="main-content"><div class="container">{% block content %}{% endblock %}</div></main>
     <script>
         const toggle = document.getElementById('menu-toggle');
         const drawer = document.getElementById('nav-drawer-wrapper');
         const overlay = document.getElementById('nav-overlay');
-
         function toggleMenu() {
             drawer.classList.toggle('active');
             overlay.classList.toggle('active');
             document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
         }
-
         if (toggle) {
             toggle.addEventListener('click', toggleMenu);
             overlay.addEventListener('click', toggleMenu);
