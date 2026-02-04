@@ -2,63 +2,86 @@
     <div class="container nav-container">
         <div class="nav-brand">
             <a href="{% url 'dashboard' %}" class="brand-link">
-                <h2>Apartment Reservation</h2>
+                <h2>Apartment Res</h2>
             </a>
             {% if user.is_staff %}
             <span class="admin-badge">Admin</span>
             {% endif %}
         </div>
 
-        <ul class="nav-menu">
-            <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
-            
-            {% if user.is_staff %}
-            <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
-            {% endif %}
-            
-            <li><a href="{% if not user.is_staff %}{% url 'my_apartment' %}{% else %}{% url 'apartment_list' %}{% endif %}" class="nav-link">{% if not user.is_staff %}My Apartment{% else %}Apartments{% endif %}</a></li>
-            <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
-            
-            <li>
-                <a href="{% url 'inbox' %}" class="nav-link message-icon">
-                    <span class="bell-icon">✉️</span>
-                    {% if unread_messages_count > 0 %}
-                    <span class="notification-badge">{{ unread_messages_count }}</span>
-                    {% endif %}
-                </a>
-            </li>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Open Menu">
+            <span class="hamburger"></span>
+        </button>
 
-            <li>
-                <a href="{% url 'notifications' %}" class="nav-link notification-bell">
-                    <span class="bell-icon">🔔</span>
-                    {% if unread_notifications > 0 %}
-                    <span class="notification-badge">{{ unread_notifications }}</span>
-                    {% endif %}
-                </a>
-            </li>
-            
-            <div class="nav-actions">
+        <div class="nav-menu-wrapper" id="nav-menu-wrapper">
+            <ul class="nav-menu">
+                <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+                
                 {% if user.is_staff %}
-                <li><a href="{% url 'apartment_create' %}" class="btn btn-outline btn-sm">+ Add Apartment</a></li>
-                <li><a href="{% url 'reservation_create' %}" class="btn btn-primary btn-sm">+ Book Apartment</a></li>
-                {% else %}
-                <li><a href="{% url 'reservation_create' %}" class="btn btn-primary btn-sm">+ Book Now</a></li>
+                <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
                 {% endif %}
                 
-                <li class="user-meta">
-                    <span class="nav-user">{{ user.first_name|default:user.username }}</span>
-                    <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+                <li>
+                    <a href="{% if not user.is_staff %}{% url 'my_apartment' %}{% else %}{% url 'apartment_list' %}{% endif %}" class="nav-link">
+                        {% if not user.is_staff %}My Apartment{% else %}Apartments{% endif %}
+                    </a>
                 </li>
-            </div>
-        </ul>
+                <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
+                
+                <li class="nav-icons-group">
+                    <a href="{% url 'inbox' %}" class="nav-icon-link">
+                        <span class="icon-img">✉️</span>
+                        {% if unread_messages_count > 0 %}
+                        <span class="notification-badge">{{ unread_messages_count }}</span>
+                        {% endif %}
+                    </a>
+
+                    <a href="{% url 'notifications' %}" class="nav-icon-link">
+                        <span class="icon-img">🔔</span>
+                        {% if unread_notifications > 0 %}
+                        <span class="notification-badge">{{ unread_notifications }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+
+                <div class="nav-actions">
+                    {% if user.is_staff %}
+                    <li><a href="{% url 'apartment_create' %}" class="btn btn-outline btn-sm">Add Unit</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'reservation_create' %}" class="btn btn-primary btn-sm">Book Now</a></li>
+                    
+                    <li class="user-meta">
+                        <span class="nav-user">{{ user.first_name|default:user.username }}</span>
+                        <a href="{% url 'logout' %}" class="logout-link">Logout</a>
+                    </li>
+                </div>
+            </ul>
+        </div>
     </div>
 </nav>
 
+<div class="nav-overlay" id="nav-overlay"></div>
+
+<script>
+    const menuToggle = document.getElementById('menu-toggle');
+    const navMenu = document.getElementById('nav-menu-wrapper');
+    const overlay = document.getElementById('nav-overlay');
+
+    function toggleMenu() {
+        navMenu.classList.toggle('active');
+        overlay.classList.toggle('active');
+        document.body.classList.toggle('no-scroll');
+    }
+
+    menuToggle.addEventListener('click', toggleMenu);
+    overlay.addEventListener('click', toggleMenu);
+</script>
+
 <style>
-/* Main Layout Fixes */
+/* --- Base Desktop Styles --- */
 .navbar {
-    background-color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -69,38 +92,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 2rem;
 }
 
-.nav-brand {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-shrink: 0; /* Prevents logo from squishing */
-}
+.nav-brand { display: flex; align-items: center; gap: 0.5rem; }
+.brand-link { text-decoration: none; color: var(--dark); }
+.brand-link h2 { margin: 0; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; }
 
-.brand-link {
-    text-decoration: none;
-    color: inherit;
-}
-
-.brand-link h2 {
-    margin: 0;
-    font-size: 1.25rem;
-    white-space: nowrap;
-}
-
-.admin-badge {
-    background-color: #fef3c7;
-    color: #92400e;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-}
-
-/* Menu Logic */
 .nav-menu {
     display: flex;
     align-items: center;
@@ -110,88 +107,86 @@
     padding: 0;
 }
 
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    border-left: 1px solid #e5e7eb;
-    padding-left: 1rem;
-    margin-left: 0.5rem;
-}
-
 .nav-link {
     text-decoration: none;
-    color: #4b5563;
-    font-weight: 500;
-    font-size: 0.95rem;
+    color: var(--gray-600);
+    font-weight: 600;
+    font-size: 0.9rem;
     transition: color 0.2s;
 }
 
-.nav-link:hover {
-    color: #2563eb;
-}
+.nav-link:hover { color: var(--primary); }
 
-/* Notification Badge Fix */
-.notification-bell {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
-}
+.nav-icons-group { display: flex; gap: 1rem; }
+.nav-icon-link { position: relative; text-decoration: none; font-size: 1.2rem; }
 
 .notification-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    background-color: #ef4444;
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 700;
-    height: 18px;
-    min-width: 18px;
-    padding: 0 4px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid white;
+    position: absolute; top: -5px; right: -8px;
+    background: #ef4444; color: white;
+    font-size: 0.6rem; font-weight: 800;
+    height: 16px; min-width: 16px;
+    border-radius: 10px; border: 2px solid white;
+    display: flex; align-items: center; justify-content: center;
 }
 
-/* User Meta Styles */
-.user-meta {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.2;
+.nav-actions {
+    display: flex; align-items: center; gap: 1rem;
+    border-left: 1px solid var(--gray-100); padding-left: 1.5rem;
 }
 
-.nav-user {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #111827;
-}
+.user-meta { display: flex; flex-direction: column; line-height: 1.2; }
+.nav-user { font-size: 0.85rem; font-weight: 700; color: var(--dark); }
+.logout-link { font-size: 0.75rem; color: #ef4444; text-decoration: none; font-weight: 600; }
 
-.logout-link {
-    font-size: 0.75rem;
-    color: #ef4444;
-    text-decoration: none;
-}
+/* Hide Mobile Elements by Default */
+.menu-toggle, .nav-overlay { display: none; }
 
-/* RESPONSIVE: Prevent Overlap on Mobile/Tablet */
-@media (max-width: 1024px) {
-    .nav-container {
-        flex-wrap: wrap;
-        gap: 1rem;
+/* --- Tablet/Mobile Responsive (The Drawer) --- */
+@media (max-width: 992px) {
+    .menu-toggle {
+        display: block;
+        background: none; border: none; cursor: pointer;
+        padding: 10px; z-index: 1100;
     }
     
-    .nav-menu {
-        gap: 1rem;
-        font-size: 0.85rem;
+    .hamburger {
+        display: block; width: 24px; height: 2px;
+        background: var(--dark); position: relative;
+    }
+    .hamburger::before, .hamburger::after {
+        content: ''; position: absolute; width: 24px; height: 2px;
+        background: var(--dark); left: 0;
+    }
+    .hamburger::before { top: -8px; }
+    .hamburger::after { bottom: -8px; }
+
+    .nav-menu-wrapper {
+        position: fixed; top: 0; right: -300px; /* Hidden off-screen */
+        width: 280px; height: 100vh;
+        background: white; z-index: 1050;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+        transition: right 0.3s ease-in-out;
+        padding: 80px 2rem 2rem 2rem;
     }
 
+    .nav-menu-wrapper.active { right: 0; }
+
+    .nav-menu { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+
     .nav-actions {
-        padding-left: 0;
-        border-left: none;
+        flex-direction: column; align-items: flex-start;
+        border-left: none; padding-left: 0; border-top: 1px solid var(--gray-100);
+        padding-top: 1.5rem; width: 100%;
     }
+
+    .nav-overlay {
+        display: block; position: fixed; top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5); z-index: 1040;
+        opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .nav-overlay.active { opacity: 1; pointer-events: auto; }
+    
+    .no-scroll { overflow: hidden; } /* Prevents background scrolling when menu is open */
 }
 </style>
