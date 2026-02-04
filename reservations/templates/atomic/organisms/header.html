@@ -9,53 +9,35 @@
             {% endif %}
         </div>
 
-        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Navigation">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
             <span class="hamburger"></span>
         </button>
 
         <div class="nav-drawer" id="nav-drawer">
             <ul class="nav-menu">
-                <li class="drawer-header">Menu</li>
+                <li class="drawer-label">Navigation</li>
                 <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
-                
                 {% if user.is_staff %}
                 <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
                 {% endif %}
-                
-                <li>
-                    <a href="{% if not user.is_staff %}{% url 'my_apartment' %}{% else %}{% url 'apartment_list' %}{% endif %}" class="nav-link">
-                        {% if not user.is_staff %}My Apartment{% else %}Apartments{% endif %}
-                    </a>
-                </li>
-                
                 <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
                 
-                <hr class="nav-divider">
+                <hr class="drawer-divider">
                 
                 <li class="nav-icons-group">
                     <a href="{% url 'inbox' %}" class="nav-icon-link">
-                        <span class="icon-img">✉️</span> Messages
+                        <span>✉️ Messages</span>
                         {% if unread_messages_count > 0 %}
-                        <span class="badge-count">{{ unread_messages_count }}</span>
-                        {% endif %}
-                    </a>
-                    <a href="{% url 'notifications' %}" class="nav-icon-link">
-                        <span class="icon-img">🔔</span> Notifications
-                        {% if unread_notifications > 0 %}
-                        <span class="badge-count">{{ unread_notifications }}</span>
+                        <span class="badge">{{ unread_messages_count }}</span>
                         {% endif %}
                     </a>
                 </li>
 
-                <div class="nav-footer-actions">
-                    {% if user.is_staff %}
-                    <a href="{% url 'apartment_create' %}" class="btn btn-outline btn-sm">Add Unit</a>
-                    {% endif %}
-                    <a href="{% url 'reservation_create' %}" class="btn btn-primary btn-sm">Book Now</a>
-                    
-                    <div class="user-info">
-                        <strong>{{ user.username }}</strong>
-                        <a href="{% url 'logout' %}" class="logout-text">Logout</a>
+                <div class="drawer-actions">
+                    <a href="{% url 'reservation_create' %}" class="btn btn-primary btn-block">Book Now</a>
+                    <div class="drawer-user">
+                        <p>{{ user.username }}</p>
+                        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
                     </div>
                 </div>
             </ul>
@@ -66,26 +48,26 @@
 <div class="nav-overlay" id="nav-overlay"></div>
 
 <script>
-    const toggle = document.getElementById('menu-toggle');
+    const btn = document.getElementById('menu-toggle');
     const drawer = document.getElementById('nav-drawer');
     const overlay = document.getElementById('nav-overlay');
 
     function toggleMenu() {
         drawer.classList.toggle('active');
         overlay.classList.toggle('active');
-        document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
+        document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'initial';
     }
 
-    toggle.addEventListener('click', toggleMenu);
+    btn.addEventListener('click', toggleMenu);
     overlay.addEventListener('click', toggleMenu);
 </script>
 
 <style>
-/* --- Navbar Core --- */
+/* --- Navbar Layout --- */
 .navbar {
     background: #fff;
-    padding: 1rem 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    padding: 12px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     position: sticky;
     top: 0;
     z-index: 1000;
@@ -93,85 +75,67 @@
 
 .nav-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* This pushes Logo left and Hamburger right */
     align-items: center;
 }
 
+/* --- Brand/Logo --- */
 .nav-brand { display: flex; align-items: center; gap: 8px; }
-.brand-link { text-decoration: none; color: #111827; }
-.brand-link h2 { margin: 0; font-size: 1.2rem; font-weight: 800; }
-
-.admin-badge {
-    background: #fff7ed; color: #c2410c; padding: 2px 6px; 
-    border-radius: 4px; font-size: 0.65rem; font-weight: 800;
-}
+.brand-link { text-decoration: none; color: #1e293b; }
+.brand-link h2 { margin: 0; font-size: 1.1rem; font-weight: 800; }
+.admin-badge { background: #fef3c7; color: #92400e; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
 
 /* --- Hamburger Icon --- */
 .menu-toggle {
-    display: block; background: none; border: none; cursor: pointer; padding: 10px;
+    background: none; border: none; cursor: pointer; padding: 8px; display: block;
 }
 .hamburger, .hamburger::before, .hamburger::after {
-    content: ''; display: block; width: 22px; height: 2px;
-    background: #111827; position: relative; transition: 0.3s;
+    content: ''; display: block; width: 22px; height: 2px; background: #1e293b; transition: 0.3s;
 }
-.hamburger::before { position: absolute; top: -7px; }
-.hamburger::after { position: absolute; bottom: 7px; }
+.hamburger { position: relative; }
+.hamburger::before { position: absolute; top: -7px; left: 0; }
+.hamburger::after { position: absolute; bottom: -7px; left: 0; }
 
-/* --- Mobile Drawer (The Fix) --- */
+/* --- Mobile Drawer (Hidden off-screen) --- */
 .nav-drawer {
     position: fixed;
     top: 0;
-    right: -100%; /* Fully off-screen */
+    right: -100%; /* Completely off-screen initially */
     width: 280px;
     height: 100vh;
     background: #fff;
     z-index: 2000;
-    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding: 2rem 1.5rem;
-    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+    padding: 2.5rem 1.5rem;
+    box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-drawer.active { right: 0; }
 
 .nav-menu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.25rem; }
-.drawer-header { font-size: 0.75rem; text-transform: uppercase; color: #9ca3af; font-weight: 800; letter-spacing: 1px; }
+.drawer-label { font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; font-weight: 800; }
+.nav-link { text-decoration: none; color: #334155; font-weight: 600; font-size: 1rem; }
+.drawer-divider { border: 0; border-top: 1px solid #f1f5f9; margin: 10px 0; }
 
-.nav-link { text-decoration: none; color: #374151; font-weight: 600; font-size: 1rem; }
-.nav-divider { border: 0; border-top: 1px solid #f3f4f6; margin: 0.5rem 0; }
-
-.nav-icons-group { display: flex; flex-direction: column; gap: 1rem; }
-.nav-icon-link { text-decoration: none; color: #374151; font-weight: 600; display: flex; align-items: center; gap: 10px; position: relative; }
-
-.badge-count {
-    background: #ef4444; color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 10px;
-}
-
-.nav-footer-actions { 
-    margin-top: auto; display: flex; flex-direction: column; gap: 1rem; 
-    padding-top: 2rem; border-top: 1px solid #f3f4f6; 
-}
-
-.user-info { display: flex; flex-direction: column; line-height: 1.4; }
-.logout-text { color: #ef4444; text-decoration: none; font-size: 0.8rem; font-weight: 700; }
+.btn-block { width: 100%; text-align: center; display: block; }
+.drawer-actions { margin-top: auto; padding-top: 2rem; }
 
 /* --- Overlay --- */
 .nav-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4); z-index: 1500;
-    opacity: 0; pointer-events: none; transition: 0.3s;
+    background: rgba(0,0,0,0.3); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s;
 }
 .nav-overlay.active { opacity: 1; pointer-events: auto; }
 
-/* --- Desktop Logic --- */
+/* --- Desktop View (Return to Header Bar) --- */
 @media (min-width: 992px) {
     .menu-toggle { display: none; }
     .nav-drawer {
-        position: static; width: auto; height: auto; background: none; 
-        box-shadow: none; padding: 0; right: 0;
+        position: static; width: auto; height: auto; background: none; padding: 0; 
+        box-shadow: none; right: 0; transition: none;
     }
-    .nav-menu { flex-direction: row; align-items: center; gap: 2rem; }
-    .drawer-header, .nav-divider { display: none; }
-    .nav-icons-group { flex-direction: row; }
-    .nav-footer-actions { flex-direction: row; border: none; padding: 0; margin: 0; align-items: center; }
+    .nav-menu { flex-direction: row; align-items: center; gap: 1.5rem; }
+    .drawer-label, .drawer-divider, .drawer-user p { display: none; }
+    .drawer-actions { margin: 0; padding: 0; display: flex; align-items: center; gap: 1rem; }
 }
 </style>
