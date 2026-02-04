@@ -6,95 +6,39 @@
     <title>{% block title %}Apartment Reservation{% endblock %}</title>
     
     <style>
-        /* ============================================
-           APARTMENT RESERVATION - PROFESSIONAL DESIGN
-           ============================================ */
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Base Variables and Layout */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: rgb(61, 64, 224);
-            --primary-dark: rgb(64, 61, 238);
-            --primary-light: rgb(68, 178, 214);
-            --primary-subtle: #dbeafe;
-            --accent: #f59e0b;
-            --danger: #ef4444;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --info: #3b82f6;
             --white: #ffffff;
             --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
             --gray-700: #374151;
-            --gray-800: #1f2937;
             --gray-900: #111827;
-            
-            --space-2: 0.5rem;
-            --space-4: 1rem;
-            --space-6: 1.5rem;
-            --space-8: 2rem;
-            --space-12: 3rem;
-            
             --radius-lg: 0.75rem;
-            --radius-xl: 1rem;
-            --radius-2xl: 1.5rem;
-            --radius-full: 9999px;
-
             --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-
-            --font-sm: 0.875rem;
-            --font-base: 1rem;
-            --font-lg: 1.125rem;
-            --font-xl: 1.25rem;
-            --font-2xl: 1.5rem;
-            --font-3xl: 1.875rem;
-            --font-4xl: 2.25rem;
-            
-            --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--gray-50);
             color: var(--gray-900);
-            line-height: 1.6;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
         }
 
-        /* Layout */
-        .container {
-            width: 100%;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 var(--space-4);
-        }
+        .container { width: 100%; max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
+        .main-content { flex: 1; padding: 1.5rem 0; }
 
-        .main-content {
-            flex: 1;
-            padding: var(--space-6) 0;
-        }
-
-        /* Navbar */
+        /* --- Updated Navbar --- */
         .navbar {
             background-color: var(--white);
             box-shadow: var(--shadow-md);
-            padding: var(--space-4) 0;
+            padding: 1rem 0;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
         }
 
         .navbar .container {
@@ -103,111 +47,52 @@
             align-items: center;
         }
 
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: var(--space-2);
-            align-items: center;
-        }
-
-        .nav-link {
-            padding: var(--space-2) var(--space-4);
-            font-weight: 600;
-            color: var(--gray-700);
-            border-radius: var(--radius-lg);
-        }
-
-        /* Grids */
-        .apartments-grid, .reservations-grid, .stats-grid {
-            display: grid;
-            gap: var(--space-6);
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        }
-
-        /* Cards */
-        .apartment-card, .reservation-card, .section, .auth-card {
-            background-color: var(--white);
-            border-radius: var(--radius-2xl);
-            border: 1px solid var(--gray-100);
-            box-shadow: var(--shadow-md);
-            overflow: hidden;
-        }
-
-        .apartment-image { height: 200px; background: #eee; position: relative; }
-        .apartment-image img { width: 100%; height: 100%; object-fit: cover; }
-        .apartment-details { padding: var(--space-6); }
-
-        /* Buttons & Forms */
-        .btn {
-            display: inline-flex;
-            padding: 0.625rem 1.25rem;
-            border-radius: var(--radius-lg);
-            font-weight: 600;
+        /* Hamburger Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
             cursor: pointer;
-            transition: all var(--transition-base);
-            text-decoration: none;
-            justify-content: center;
-        }
-        .btn-primary { background: var(--primary); color: white; border: none; }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 0.625rem;
-            border: 1.5px solid var(--gray-300);
-            border-radius: var(--radius-lg);
-            margin-bottom: var(--space-4);
+            padding: 5px;
+            z-index: 1100;
         }
 
-        /* ============================================
-           MOBILE RESPONSIVENESS (Media Queries)
-           ============================================ */
-
-        /* Tablets and smaller */
-        @media (max-width: 1024px) {
-            .apartment-detail-grid {
-                grid-template-columns: 1fr; /* Stack detail image and info */
-                gap: var(--space-6);
-            }
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: var(--space-4);
-            }
+        .hamburger-bar, .hamburger-bar::before, .hamburger-bar::after {
+            content: ''; display: block; width: 22px; height: 2px;
+            background: var(--gray-900); transition: 0.3s; position: relative;
         }
+        .hamburger-bar::before { position: absolute; top: -7px; }
+        .hamburger-bar::after { position: absolute; bottom: -7px; }
 
-        /* Mobile Phones */
+        /* --- Mobile Drawer Drawer Logic --- */
         @media (max-width: 768px) {
-            :root {
-                --font-4xl: 1.75rem; /* Shrink headers for mobile */
-                --font-3xl: 1.5rem;
+            .menu-toggle { display: block; }
+            
+            .nav-drawer-wrapper {
+                position: fixed;
+                top: 0;
+                right: -100%; /* Hidden off-screen */
+                width: 280px;
+                height: 100vh;
+                background: var(--white);
+                z-index: 1050;
+                transition: right 0.3s ease;
+                padding: 4rem 1.5rem;
+                box-shadow: -10px 0 30px rgba(0,0,0,0.1);
             }
 
-            .nav-menu {
-                display: none; /* Hide menu - suggest implementing a toggle later */
-            }
+            .nav-drawer-wrapper.active { right: 0; } /* Slide in */
 
-            .apartments-grid, .reservations-grid, .stats-grid {
-                grid-template-columns: 1fr; /* Force 1 column on mobile */
+            .nav-overlay {
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+                background: rgba(0,0,0,0.4); z-index: 1040;
+                display: none;
             }
+            .nav-overlay.active { display: block; }
+        }
 
-            .auth-card, .form-container, .apartment-detail {
-                padding: var(--space-6); /* Reduce padding on mobile */
-                border-radius: var(--radius-xl);
-            }
-
-            .form-actions, .detail-actions {
-                flex-direction: column; /* Stack buttons */
-            }
-
-            .btn {
-                width: 100%; /* Make buttons full width for thumbs */
-            }
-
-            .messages-container {
-                left: var(--space-4);
-                right: var(--space-4);
-                max-width: none;
-            }
+        @media (min-width: 769px) {
+            .nav-drawer-wrapper { display: block; }
         }
     </style>
 </head>
@@ -215,15 +100,23 @@
     <header class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <h2>Apartments</h2>
+                <a href="/" style="text-decoration: none; color: inherit;">
+                    <h2>Apartments</h2>
+                </a>
             </div>
+
             {% if user.is_authenticated %}
-                {% include 'atomic/organisms/header.html' %}
+                <button class="menu-toggle" id="menu-toggle">
+                    <span class="hamburger-bar"></span>
+                </button>
+
+                <div class="nav-drawer-wrapper" id="nav-drawer-wrapper">
+                    {% include 'atomic/organisms/header.html' %}
+                </div>
+                <div class="nav-overlay" id="nav-overlay"></div>
             {% endif %}
         </div>
     </header>
-
-    {% include 'atomic/organisms/messages.html' %}
 
     <main class="main-content">
         <div class="container">
@@ -231,12 +124,20 @@
         </div>
     </main>
 
-    <footer class="footer">
-        <div class="container">
-            {% include 'atomic/organisms/footer.html' %}
-        </div>
-    </footer>
+    <script>
+        const toggle = document.getElementById('menu-toggle');
+        const drawer = document.getElementById('nav-drawer-wrapper');
+        const overlay = document.getElementById('nav-overlay');
 
-    <script src="/static/js/script.js"></script>
+        if (toggle) {
+            function toggleMenu() {
+                drawer.classList.toggle('active');
+                overlay.classList.toggle('active');
+                document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
+            }
+            toggle.addEventListener('click', toggleMenu);
+            overlay.addEventListener('click', toggleMenu);
+        }
+    </script>
 </body>
 </html>
