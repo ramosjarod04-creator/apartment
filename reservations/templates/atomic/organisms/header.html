@@ -1,6 +1,6 @@
 <div class="nav-content-layout">
     <ul class="nav-links">
-        <li class="mobile-section-label">MAIN MENU</li>
+        <li class="mobile-section-label">Main Menu</li>
         <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
         {% if user.is_staff %}
             <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
@@ -22,17 +22,17 @@
             <span class="plus">+</span> Book Now
         </a>
         
-        <div class="user-pill">
-            <div class="user-meta">
-                <span class="user-handle">@{{ user.username }}</span>
-                <a href="{% url 'logout' %}" class="link-logout">Log out</a>
+        <div class="user-profile-section">
+            <div class="user-info">
+                <span class="username">@{{ user.username }}</span>
+                <a href="{% url 'logout' %}" class="logout-btn">Log out</a>
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* --- Main Layout --- */
+    /* --- Shared Styles --- */
     .nav-content-layout { display: flex; align-items: center; width: 100%; gap: 1.5rem; }
     .nav-links { display: flex; list-style: none; gap: 1rem; align-items: center; }
     .nav-link { 
@@ -43,65 +43,56 @@
 
     .nav-actions { display: flex; align-items: center; gap: 1rem; }
 
-    /* --- Messages Card --- */
+    /* Messages Style */
     .action-card { 
         text-decoration: none; color: var(--gray-700); display: flex; 
-        align-items: center; gap: 10px; font-weight: 600; font-size: 0.9rem;
-        padding: 0.6rem 1rem; border-radius: 10px; white-space: nowrap;
+        align-items: center; gap: 8px; font-weight: 600; font-size: 0.9rem;
+        white-space: nowrap;
     }
+    .count-badge { background: var(--danger); color: white; font-size: 0.7rem; padding: 1px 6px; border-radius: 20px; }
 
-    .count-badge {
-        background: var(--danger); color: white; font-size: 0.7rem;
-        padding: 1px 6px; border-radius: 20px;
-    }
-
-    /* --- Primary Button --- */
+    /* Button Style (Prevents Cutting) */
     .btn-primary-nav {
         background: var(--primary); color: white; text-decoration: none;
         padding: 0.7rem 1.25rem; border-radius: 10px; font-weight: 700;
         font-size: 0.9rem; white-space: nowrap; display: flex; align-items: center; gap: 8px;
     }
-    .btn-primary-nav:hover { background: var(--primary-hover); }
+    .btn-primary-nav:hover { background: var(--primary-hover); transform: translateY(-1px); }
 
-    /* --- User Profile --- */
-    .user-pill { border-left: 1px solid var(--gray-200); padding-left: 1rem; }
-    .user-meta { display: flex; flex-direction: column; line-height: 1.2; }
-    .user-handle { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
-    .link-logout { font-size: 0.75rem; color: var(--danger); text-decoration: none; font-weight: 600; }
+    /* User Profile */
+    .user-profile-section { border-left: 1px solid var(--gray-200); padding-left: 1rem; }
+    .user-info { display: flex; flex-direction: column; line-height: 1.2; }
+    .username { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
+    .logout-btn { font-size: 0.75rem; color: var(--danger); text-decoration: none; font-weight: 600; }
 
     .mobile-section-label { display: none; }
 
-    /* --- MOBILE OVERRIDES (image_88141d.png fixes) --- */
+    /* --- Mobile Fixes --- */
     @media (max-width: 991px) {
         .nav-content-layout { flex-direction: column; align-items: flex-start; gap: 2rem; }
-        .nav-links { flex-direction: column; width: 100%; gap: 0.5rem; }
+        .nav-links { flex-direction: column; width: 100%; gap: 0.25rem; }
         
         .mobile-section-label { 
-            display: block; font-size: 0.7rem; font-weight: 900; 
-            color: var(--gray-400); letter-spacing: 1.5px; margin-bottom: 0.5rem;
+            display: block; font-size: 0.7rem; font-weight: 800; 
+            color: #9ca3af; letter-spacing: 1px; margin-bottom: 0.5rem; 
         }
 
         .nav-link { 
-            display: block; width: 100%; font-size: 1.1rem; padding: 0.75rem 0;
+            display: block; width: 100%; font-size: 1.1rem; padding: 0.8rem 0;
             border-bottom: 1px solid var(--gray-100); border-radius: 0;
         }
         
         .nav-actions { flex-direction: column; width: 100%; gap: 1.25rem; }
         
         .action-card { 
-            width: 100%; background: var(--gray-50); border: 1px solid var(--gray-100);
-            padding: 1rem; justify-content: flex-start;
+            width: 100%; background: var(--gray-50); padding: 1rem; 
+            border-radius: 12px; border: 1px solid var(--gray-100);
         }
         
-        .btn-primary-nav { 
-            width: 100%; justify-content: center; padding: 1rem; 
-            font-size: 1rem; box-shadow: 0 4px 12px rgba(61, 64, 224, 0.2);
-        }
+        .btn-primary-nav { width: 100%; justify-content: center; padding: 1rem; font-size: 1rem; }
         
-        .user-pill { 
-            border-left: none; padding-left: 0; width: 100%; 
-            padding-top: 1.5rem; border-top: 1px solid var(--gray-200); 
-        }
-        .user-handle { font-size: 1.1rem; }
+        .user-profile-section { border-left: none; padding-left: 0; width: 100%; padding-top: 1.5rem; border-top: 1px solid var(--gray-200); }
+        .username { font-size: 1.1rem; }
+        .logout-btn { font-size: 0.95rem; margin-top: 4px; }
     }
 </style>
