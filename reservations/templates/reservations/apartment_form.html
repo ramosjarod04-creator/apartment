@@ -6,30 +6,146 @@
 <div class="container">
     <div class="form-container">
         <div class="form-header">
-            <h1>{{ action }} Apartment</h1>
-            <a href="{% url 'apartment_list' %}" class="btn btn-outline">← Back</a>
+            <div class="form-title">
+                <h1>{{ action }} Apartment</h1>
+                <p>Please fill in the details below</p>
+            </div>
+            <a href="{% url 'apartment_list' %}" class="btn btn-outline btn-sm hide-mobile">Back to List</a>
         </div>
 
         <form method="post" enctype="multipart/form-data" class="apartment-form">
             {% csrf_token %}
             
-            {% for field in form %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                    <span class="form-error">{{ error }}</span>
-                    {% endfor %}
-                {% endif %}
+            <div class="form-fields-grid">
+                {% for field in form %}
+                <div class="form-group {% if field.name == 'description' or field.name == 'image' %}full-width-field{% endif %}">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    <div class="input-wrapper">
+                        {{ field }}
+                    </div>
+                    {% if field.help_text %}
+                        <small class="form-help">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                        <span class="form-error">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Save Apartment</button>
-                <a href="{% url 'apartment_list' %}" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary btn-lg">Save Apartment</button>
+                <a href="{% url 'apartment_list' %}" class="btn btn-outline btn-lg">Cancel</a>
             </div>
         </form>
     </div>
 </div>
+
+<style>
+/* Container & Header */
+.form-container {
+    background: white;
+    padding: 2.5rem;
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.form-title h1 { color: var(--gray-900); font-size: 1.75rem; }
+.form-title p { color: var(--gray-500); font-size: 0.9rem; }
+
+/* Grid Layout for Desktop */
+.form-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Two columns on desktop */
+    gap: 1.5rem;
+}
+
+/* Fields that should always be full width */
+.full-width-field {
+    grid-column: span 2;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* Input Overrides */
+input, select, textarea {
+    border: 1.5px solid var(--gray-200);
+    padding: 0.75rem;
+    font-size: 1rem;
+    border-radius: var(--radius-md);
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+input:focus { border-color: var(--primary); outline: none; }
+
+.form-help { color: var(--gray-400); font-size: 0.8rem; margin-top: 0.25rem; }
+.form-error { color: var(--danger); font-size: 0.8rem; font-weight: 600; }
+
+/* Actions */
+.form-actions {
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 1rem;
+}
+
+.form-actions .btn { flex: 1; }
+
+/* Responsive Media Queries */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 1.5rem;
+        margin: 1rem 0;
+        border-radius: var(--radius-lg);
+        box-shadow: none;
+        border: 1px solid var(--gray-100);
+    }
+
+    .form-fields-grid {
+        grid-template-columns: 1fr; /* Stack to one column */
+    }
+
+    .full-width-field {
+        grid-column: span 1;
+    }
+
+    .form-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-actions {
+        flex-direction: column; /* Buttons stack vertically */
+    }
+
+    .hide-mobile {
+        display: none;
+    }
+}
+</style>
 {% endblock %}
