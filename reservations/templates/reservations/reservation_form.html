@@ -5,52 +5,67 @@
 {% block content %}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-<div class="container">
-    <div class="form-container">
+<div class="container res-form-container">
+    <div class="form-card">
         <div class="form-header">
-            <h1>{{ action }} Reservation</h1>
-            <a href="{% url 'reservation_list' %}" class="btn btn-outline">← Back</a>
+            <div class="header-main">
+                <span class="step-label">Reservation Process</span>
+                <h1>{{ action }} Reservation</h1>
+            </div>
+            <a href="{% url 'reservation_list' %}" class="back-link">Back to List</a>
         </div>
 
         {% if is_admin and action == 'Create' %}
-        <div class="alert alert-info admin-info">
-            <strong>ℹ️ Admin Mode:</strong> As an administrator, you can auto-approve your own reservation or submit for review.
+        <div class="admin-banner">
+            <strong>Admin Privilege</strong>
+            <p>You can auto-approve this entry to bypass the manual review process.</p>
         </div>
         {% endif %}
 
-        <form method="post" class="reservation-form">
+        <form method="post" class="styled-form">
             {% csrf_token %}
             
-            {% for field in form %}
-            <div class="form-group">
-                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    {% for error in field.errors %}
-                    <span class="form-error">{{ error }}</span>
-                    {% endfor %}
-                {% endif %}
-                {% if field.help_text %}
-                <small class="form-help">{{ field.help_text }}</small>
-                {% endif %}
+            <div class="form-grid">
+                {% for field in form %}
+                <div class="form-group {% if field.name == 'special_requests' %}full-width{% endif %}">
+                    <label for="{{ field.id_for_label }}" class="field-label">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="required">*</span>{% endif %}
+                    </label>
+                    
+                    <div class="input-wrapper">
+                        {{ field }}
+                    </div>
+
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                        <span class="field-error">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    {% if field.help_text %}
+                    <small class="field-help">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
 
             {% if is_admin and action == 'Create' %}
-            <div class="form-group">
-                <label class="checkbox-label">
+            <div class="admin-toggle">
+                <label class="checkbox-container">
                     <input type="checkbox" name="auto_approve" value="1">
-                    <span>Auto-approve this reservation (skip approval process)</span>
+                    <span class="checkmark"></span>
+                    <span class="label-text">Auto-approve this reservation immediately</span>
                 </label>
             </div>
             {% endif %}
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
+            <div class="form-footer">
+                <button type="submit" class="btn btn-primary btn-lg">
                     {% if is_admin and action == 'Create' %}
-                    Submit Reservation
+                        Submit & Finalize
                     {% else %}
-                    Confirm Reservation
+                        Confirm Reservation
                     {% endif %}
                 </button>
                 <a href="{% url 'reservation_list' %}" class="btn btn-outline">Cancel</a>
@@ -64,9 +79,8 @@
 
 <script>
 $(document).ready(function() {
-    // This targets the class we added in forms.py
     $('.searchable-select').select2({
-        placeholder: "Search for an available unit...",
+        placeholder: "Search for a unit...",
         allowClear: true,
         width: '100%'
     });
@@ -74,35 +88,59 @@ $(document).ready(function() {
 </script>
 
 <style>
-/* 3. Style fix for Select2 to match your existing design */
-.select2-container--default .select2-selection--single {
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    height: 42px;
-    padding-top: 5px;
-}
-.select2-container {
-    margin-top: 5px;
-}
+    .res-form-container { max-width: 800px; margin: 2rem auto; }
+    .form-card { background: white; border-radius: var(--radius-xl); border: 1px solid var(--gray-200); box-shadow: var(--shadow-md); padding: 2.5rem; }
 
-.admin-info {
-    padding: 1rem;
-    background-color: #dbeafe;
-    border-left: 4px solid #3b82f6;
-    border-radius: var(--radius-md);
-    margin-bottom: 2rem;
-}
+    /* Header */
+    .form-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; }
+    .step-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: var(--primary); letter-spacing: 1px; display: block; margin-bottom: 4px; }
+    .form-header h1 { margin: 0; font-size: 1.75rem; color: var(--dark); }
+    .back-link { color: var(--gray-500); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+    .back-link:hover { color: var(--primary); }
 
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-}
+    /* Admin Banner */
+    .admin-banner { background: #eff6ff; border-left: 4px solid var(--primary); padding: 1rem 1.5rem; border-radius: var(--radius-md); margin-bottom: 2rem; }
+    .admin-banner strong { color: #1e40af; display: block; font-size: 0.9rem; text-transform: uppercase; }
+    .admin-banner p { margin: 2px 0 0 0; font-size: 0.9rem; color: #1e40af; }
 
-.checkbox-label input[type="checkbox"] {
-    width: auto;
-    cursor: pointer;
-}
+    /* Form Layout */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .full-width { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 8px; }
+    .field-label { font-weight: 700; font-size: 0.9rem; color: var(--gray-700); }
+    .required { color: #ef4444; margin-left: 4px; }
+
+    /* Input Styling Override */
+    .styled-form input:not([type="checkbox"]), 
+    .styled-form select, 
+    .styled-form textarea {
+        width: 100%; padding: 12px 16px; border-radius: var(--radius-md);
+        border: 1px solid var(--gray-300); font-size: 1rem; transition: all 0.2s;
+    }
+    .styled-form input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+
+    /* Select2 Skinning */
+    .select2-container--default .select2-selection--single {
+        border: 1px solid var(--gray-300); border-radius: var(--radius-md); height: 48px; display: flex; align-items: center;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { padding-left: 16px; color: var(--dark); }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 46px; }
+
+    /* Admin Toggle */
+    .admin-toggle { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-100); }
+    .checkbox-container { display: flex; align-items: center; gap: 12px; cursor: pointer; font-weight: 600; color: var(--dark); font-size: 0.95rem; }
+
+    .form-footer { margin-top: 2.5rem; display: flex; gap: 1rem; align-items: center; }
+    .btn-lg { padding: 14px 28px; font-size: 1rem; }
+
+    .field-error { color: #ef4444; font-size: 0.8rem; font-weight: 600; }
+    .field-help { color: var(--gray-400); font-size: 0.8rem; }
+
+    @media (max-width: 600px) {
+        .form-grid { grid-template-columns: 1fr; }
+        .form-card { padding: 1.5rem; }
+        .form-footer { flex-direction: column; }
+        .form-footer .btn { width: 100%; }
+    }
 </style>
 {% endblock %}
