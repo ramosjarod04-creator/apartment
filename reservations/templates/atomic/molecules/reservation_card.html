@@ -1,36 +1,133 @@
-<div class="reservation-card">
-    <div class="reservation-header">
-        <h4>{{ reservation.apartment.name }}</h4>
-        <span class="badge badge-{{ reservation.status }}">{{ reservation.get_status_display }}</span>
+<div class="res-card status-{{ reservation.status }}">
+    <div class="res-sidebar">
+        <div class="res-month">{{ reservation.check_in|date:"M" }}</div>
+        <div class="res-day">{{ reservation.check_in|date:"d" }}</div>
+        <div class="res-year">{{ reservation.check_in|date:"Y" }}</div>
     </div>
-    <div class="reservation-details">
-        {% if user.is_staff %}
-        <p><strong>Tenant:</strong> {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
-        {% endif %}
-        <p><strong>Unit:</strong> {{ reservation.apartment.unit_number }}</p>
-        <p><strong>Check-in:</strong> {{ reservation.check_in }}</p>
-        <p><strong>Check-out:</strong> {{ reservation.check_out }}</p>
-        <p><strong>Duration:</strong> {{ reservation.months }} month(s)</p>
-        <p><strong>Total:</strong> ₱{{ reservation.total_price|floatformat:2 }}</p>
-        {% if reservation.reviewed_by %}
-        <p><strong>Reviewed by:</strong> {{ reservation.reviewed_by.get_full_name|default:reservation.reviewed_by.username }}</p>
-        {% endif %}
-        {% if reservation.admin_notes and user.is_staff or reservation.status == 'denied' %}
-        <p><strong>Notes:</strong> {{ reservation.admin_notes }}</p>
-        {% endif %}
-    </div>
-    <div class="reservation-actions">
-        {% if user.is_staff and reservation.status == 'pending' %}
-            <a href="{% url 'reservation_approve' reservation.pk %}" class="btn btn-success btn-sm"> Approve</a>
-            <a href="{% url 'reservation_deny' reservation.pk %}" class="btn btn-danger btn-sm"> Deny</a>
-        {% endif %}
-        
-        {% if reservation.status == 'pending' and not user.is_staff %}
-            <a href="{% url 'reservation_update' reservation.pk %}" class="btn btn-secondary btn-sm">Edit</a>
-        {% endif %}
-        
-        {% if reservation.status in 'pending,approved' %}
-            <a href="{% url 'reservation_delete' reservation.pk %}" class="btn btn-danger btn-sm">Cancel</a>
-        {% endif %}
+
+    <div class="res-main">
+        <div class="res-header">
+            <div class="res-title-box">
+                <h4 class="res-apt-name">{{ reservation.apartment.name }}</h4>
+                <span class="res-unit-tag">Unit {{ reservation.apartment.unit_number }}</span>
+            </div>
+            <span class="badge badge-{{ reservation.status }}">
+                {{ reservation.get_status_display }}
+            </span>
+        </div>
+
+        <div class="res-body">
+            <div class="res-info-grid">
+                {% if user.is_staff %}
+                <div class="res-info-item">
+                    <span class="res-label">Tenant</span>
+                    <span class="res-value">{{ reservation.user.get_full_name|default:reservation.user.username }}</span>
+                </div>
+                {% endif %}
+
+                <div class="res-info-item">
+                    <span class="res-label">Stay Duration</span>
+                    <span class="res-value">{{ reservation.months }} Month{{ reservation.months|pluralize }}</span>
+                </div>
+
+                <div class="res-info-item">
+                    <span class="res-label">Total Amount</span>
+                    <span class="res-value price-text">₱{{ reservation.total_price|floatformat:2 }}</span>
+                </div>
+
+                {% if reservation.reviewed_by %}
+                <div class="res-info-item">
+                    <span class="res-label">Approved By</span>
+                    <span class="res-value">{{ reservation.reviewed_by.get_full_name|default:reservation.reviewed_by.username }}</span>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if reservation.admin_notes and user.is_staff or reservation.status == 'denied' and reservation.admin_notes %}
+            <div class="res-note-box">
+                <strong>Note:</strong> {{ reservation.admin_notes }}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="res-footer">
+            <div class="res-actions">
+                {% if user.is_staff and reservation.status == 'pending' %}
+                    <a href="{% url 'reservation_approve' reservation.pk %}" class="btn btn-success btn-sm">Approve</a>
+                    <a href="{% url 'reservation_deny' reservation.pk %}" class="btn btn-danger-soft btn-sm">Deny</a>
+                {% endif %}
+                
+                {% if reservation.status == 'pending' and not user.is_staff %}
+                    <a href="{% url 'reservation_update' reservation.pk %}" class="btn btn-outline btn-sm">Edit Request</a>
+                {% endif %}
+                
+                {% if reservation.status == 'pending' or reservation.status == 'approved' %}
+                    <form method="POST" action="{% url 'reservation_delete' reservation.pk %}" style="display:inline;" onsubmit="return confirm('Are you sure you want to cancel this reservation?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-link-danger btn-sm">Cancel</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
+
+<style>
+    .res-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        display: flex;
+        overflow: hidden;
+        transition: transform 0.2s;
+        margin-bottom: 1rem;
+    }
+    .res-card:hover { transform: scale(1.01); box-shadow: var(--shadow-md); }
+
+    /* Date Sidebar */
+    .res-sidebar {
+        background: var(--gray-50);
+        padding: 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-right: 1px solid var(--gray-100);
+        min-width: 80px;
+        text-align: center;
+    }
+    .res-month { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; color: var(--primary); }
+    .res-day { font-size: 1.5rem; font-weight: 900; color: var(--dark); line-height: 1; margin: 4px 0; }
+    .res-year { font-size: 0.7rem; color: var(--gray-400); font-weight: 700; }
+
+    /* Main Content */
+    .res-main { flex-grow: 1; padding: 1.25rem; display: flex; flex-direction: column; }
+    
+    .res-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+    .res-apt-name { margin: 0; font-size: 1.1rem; font-weight: 800; color: var(--dark); }
+    .res-unit-tag { font-size: 0.8rem; color: var(--gray-500); font-weight: 600; }
+
+    /* Info Grid */
+    .res-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; margin-bottom: 1rem; }
+    .res-info-item { display: flex; flex-direction: column; }
+    .res-label { font-size: 0.7rem; text-transform: uppercase; color: var(--gray-400); font-weight: 700; letter-spacing: 0.5px; }
+    .res-value { font-size: 0.9rem; color: var(--gray-800); font-weight: 600; }
+    .price-text { color: var(--primary); font-weight: 800; }
+
+    /* Notes */
+    .res-note-box { background: #fffbeb; border-left: 3px solid #f59e0b; padding: 8px 12px; font-size: 0.85rem; border-radius: 4px; margin-bottom: 1rem; }
+
+    /* Footer & Actions */
+    .res-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--gray-50); }
+    .res-actions { display: flex; gap: 8px; align-items: center; }
+
+    /* Custom Button Variations for Cards */
+    .btn-danger-soft { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
+    .btn-link-danger { background: none; border: none; color: var(--gray-400); font-weight: 600; cursor: pointer; }
+    .btn-link-danger:hover { color: #dc2626; text-decoration: underline; }
+
+    /* Status Coloring */
+    .status-approved .res-sidebar { border-right: 4px solid #10b981; }
+    .status-pending .res-sidebar { border-right: 4px solid #f59e0b; }
+    .status-denied .res-sidebar { border-right: 4px solid #ef4444; opacity: 0.8; }
+</style>
