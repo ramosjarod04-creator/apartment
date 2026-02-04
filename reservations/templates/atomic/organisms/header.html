@@ -21,9 +21,12 @@
         
         <div class="user-profile-section">
             <div class="user-info">
-                <span class="username">@{{ user.username }}</span>
-                <a href="{% url 'logout' %}" class="logout-btn">Log out</a>
+                <span class="username-label">Logged in as</span>
+                <span class="username-display">@{{ user.username }}</span>
             </div>
+            <a href="{% url 'logout' %}" class="btn-logout-large">
+                Logout
+            </a>
         </div>
     </div>
 </div>
@@ -46,19 +49,52 @@
         font-size: 0.9rem; white-space: nowrap; display: flex; align-items: center; gap: 8px;
     }
 
-    .user-profile-section { border-left: 1px solid var(--gray-200); padding-left: 1rem; }
+    .user-profile-section { 
+        border-left: 1px solid var(--gray-200); 
+        padding-left: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
     .user-info { display: flex; flex-direction: column; line-height: 1.2; }
-    .username { font-size: 0.85rem; font-weight: 700; }
-    .logout-btn { font-size: 0.75rem; color: var(--danger); text-decoration: none; font-weight: 600; }
+    .username-label { font-size: 0.65rem; color: var(--gray-400); text-transform: uppercase; font-weight: 700; }
+    .username-display { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); }
+
+    /* New Logout Button Style */
+    .btn-logout-large {
+        background: var(--danger-light);
+        color: var(--danger);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: 0.2s;
+    }
+    .btn-logout-large:hover { background: var(--danger); color: white; }
 
     @media (max-width: 991px) {
-        .nav-content-layout { flex-direction: column; align-items: flex-start; gap: 2rem; }
+        .nav-content-layout { flex-direction: column; align-items: flex-start; gap: 2rem; height: 100%; }
         .nav-links { flex-direction: column; width: 100%; }
         .mobile-section-label { display: block; font-size: 0.7rem; color: #9ca3af; font-weight: 800; margin-bottom: 0.5rem; }
         .nav-link { display: block; width: 100%; font-size: 1.1rem; padding: 0.8rem 0; border-bottom: 1px solid var(--gray-100); }
-        .nav-actions { flex-direction: column; width: 100%; gap: 1.25rem; }
+        .nav-actions { flex-direction: column; width: 100%; gap: 1.25rem; margin-top: auto; } /* Push to bottom */
         .action-card { width: 100%; background: var(--gray-50); padding: 1rem; border-radius: 12px; }
-        .btn-primary-nav { width: 100%; justify-content: center; padding: 1rem; }
-        .user-profile-section { border-left: none; padding-left: 0; width: 100%; border-top: 1px solid var(--gray-200); padding-top: 1.5rem; }
+        .btn-primary-nav { width: 100%; justify-content: center; padding: 1.1rem; font-size: 1rem; }
+        
+        .user-profile-section { 
+            border-left: none; padding-left: 0; width: 100%; 
+            border-top: 1px solid var(--gray-200); padding-top: 1.5rem;
+            flex-direction: column; align-items: flex-start;
+        }
+
+        /* Large Mobile Logout */
+        .btn-logout-large {
+            width: 100%;
+            text-align: center;
+            padding: 1rem;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
     }
 </style>
