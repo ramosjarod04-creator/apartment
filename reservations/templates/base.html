@@ -6,10 +6,8 @@
     <title>{% block title %}Apartment Reservation{% endblock %}</title>
     
     <style>
-        /* CSS Variables */
         :root {
             --primary: rgb(61, 64, 224);
-            --primary-hover: rgb(45, 48, 200);
             --white: #ffffff;
             --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
@@ -17,20 +15,12 @@
             --gray-700: #374151;
             --gray-900: #111827;
             --danger: #ef4444;
-            --radius-lg: 0.75rem;
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, sans-serif; background-color: var(--gray-50); color: var(--gray-900); }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--gray-50);
-            color: var(--gray-900);
-            line-height: 1.5;
-        }
-
-        /* --- Fixed Header (Prevents Overlap) --- */
         .navbar {
             background-color: var(--white);
             padding: 0.85rem 0;
@@ -45,20 +35,13 @@
             margin: 0 auto;
             padding: 0 1.25rem;
             display: flex;
-            justify-content: space-between; /* Brand Left, Toggle Right */
+            justify-content: space-between;
             align-items: center;
         }
 
-        .nav-brand h2 { 
-            font-size: 1.25rem; 
-            font-weight: 800; 
-            color: var(--gray-900);
-            letter-spacing: -0.5px;
-        }
+        .nav-brand h2 { font-size: 1.25rem; font-weight: 800; }
+        .nav-brand a { text-decoration: none; color: inherit; }
 
-        .nav-brand a { text-decoration: none; }
-
-        /* --- Hamburger Toggle --- */
         .menu-toggle {
             display: none;
             background: var(--gray-100);
@@ -76,29 +59,30 @@
         .hamburger-bar::before { position: absolute; top: -6px; }
         .hamburger-bar::after { position: absolute; bottom: -6px; }
 
-        /* --- Professional Sidebar Drawer --- */
+        /* --- Updated Right Sidebar Logic --- */
         @media (max-width: 991px) {
             .menu-toggle { display: block; }
             
             .nav-drawer-wrapper {
                 position: fixed;
                 top: 0;
-                right: -100%; /* Hidden off-screen */
-                width: 85%; /* Responsive width */
-                max-width: 320px; /* Wider to prevent text cutting */
+                right: 0; /* Anchor to right */
+                width: 85%;
+                max-width: 300px;
                 height: 100vh;
                 background: var(--white);
                 z-index: 1050;
+                /* Start hidden completely off-screen to the right */
+                transform: translateX(100%); 
                 transition: transform 0.3s ease-in-out;
                 box-shadow: var(--shadow-lg);
                 padding: 2rem 1.5rem;
                 overflow-y: auto;
             }
 
-            /* Use transform for smoother animation */
+            /* Slide in from the right to its original position (0) */
             .nav-drawer-wrapper.active { 
-                transform: translateX(-100%);
-                right: 0;
+                transform: translateX(0); 
             }
 
             .nav-overlay {
@@ -119,9 +103,7 @@
     <header class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <a href="/">
-                    <h2>Apartments</h2>
-                </a>
+                <a href="/"><h2>Apartments</h2></a>
             </div>
 
             {% if user.is_authenticated %}
@@ -151,7 +133,6 @@
         function toggleMenu() {
             drawer.classList.toggle('active');
             overlay.classList.toggle('active');
-            // Freeze body scroll when menu is open
             document.body.style.overflow = drawer.classList.contains('active') ? 'hidden' : 'auto';
         }
 
