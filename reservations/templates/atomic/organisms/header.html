@@ -1,48 +1,49 @@
 <nav class="navbar">
     <div class="container nav-container">
-        <div class="nav-brand">
-            <a href="{% url 'dashboard' %}" class="brand-link">
-                <h2>Apartment Res</h2>
-            </a>
-            {% if user.is_staff %}
-            <span class="admin-badge">Admin</span>
-            {% endif %}
+        <div class="nav-top-bar">
+            <div class="nav-brand">
+                <a href="{% url 'dashboard' %}" class="brand-link">
+                    <h2>Apartment Res</h2>
+                </a>
+                {% if user.is_staff %}
+                <span class="admin-badge">Admin</span>
+                {% endif %}
+            </div>
+
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
+                <span class="hamburger"></span>
+            </button>
         </div>
 
-        <button class="menu-toggle" id="menu-toggle">
-            <span class="hamburger"></span>
-        </button>
-
         <div class="nav-drawer" id="nav-drawer">
-            <div class="drawer-content">
-                <ul class="nav-menu">
-                    <li class="drawer-section">Menu</li>
-                    <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
-                    {% if user.is_staff %}
-                    <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
-                    {% endif %}
-                    <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
-                    
-                    <hr class="nav-divider">
-                    
-                    <li class="nav-icons-group">
-                        <a href="{% url 'inbox' %}" class="nav-icon-link">
-                            <span>✉️ Messages</span>
-                            {% if unread_messages_count > 0 %}
-                            <span class="badge">{{ unread_messages_count }}</span>
-                            {% endif %}
-                        </a>
-                    </li>
+            <ul class="nav-menu">
+                <li class="menu-label">Navigation</li>
+                <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+                {% if user.is_staff %}
+                <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
+                {% endif %}
+                <li><a href="{% url 'apartment_list' %}" class="nav-link">Apartments</a></li>
+                <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
+                
+                <hr class="nav-divider">
 
-                    <div class="drawer-footer">
-                        <a href="{% url 'reservation_create' %}" class="btn btn-primary btn-full">Book Now</a>
-                        <div class="user-control">
-                            <span class="username">{{ user.username }}</span>
-                            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
-                        </div>
+                <li class="nav-icons">
+                    <a href="{% url 'inbox' %}" class="nav-icon-link">
+                        <span>✉️ Messages</span>
+                        {% if unread_messages_count > 0 %}
+                        <span class="count-badge">{{ unread_messages_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+
+                <div class="drawer-footer">
+                    <a href="{% url 'reservation_create' %}" class="btn btn-primary btn-full">Book Now</a>
+                    <div class="user-meta">
+                        <span class="username">{{ user.username }}</span>
+                        <a href="{% url 'logout' %}" class="logout-link">Logout</a>
                     </div>
-                </ul>
-            </div>
+                </div>
+            </ul>
         </div>
     </div>
 </nav>
@@ -66,34 +67,36 @@
 </script>
 
 <style>
-/* --- Core Styles --- */
+/* --- Core Navbar --- */
 .navbar {
     background: #ffffff;
-    padding: 1rem 0;
+    padding: 0.75rem 0;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: sticky;
     top: 0;
     z-index: 1000;
 }
 
-.nav-container {
+/* Force Logo and Hamburger to opposite sides */
+.nav-top-bar {
     display: flex;
-    justify-content: space-between; /* Keeps Logo left, Hamburger right */
+    justify-content: space-between;
     align-items: center;
+    width: 100%;
 }
 
 .nav-brand { display: flex; align-items: center; gap: 8px; }
 .brand-link { text-decoration: none; color: #111827; }
-.brand-link h2 { margin: 0; font-size: 1.1rem; font-weight: 800; white-space: nowrap; }
+.brand-link h2 { margin: 0; font-size: 1.15rem; font-weight: 800; white-space: nowrap; }
 
 .admin-badge {
     background: #fff7ed; color: #c2410c; padding: 2px 6px; 
-    border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+    border-radius: 4px; font-size: 0.65rem; font-weight: 800;
 }
 
-/* --- Hamburger Icon --- */
+/* --- Hamburger Style --- */
 .menu-toggle {
-    background: none; border: none; cursor: pointer; padding: 5px; z-index: 1100;
+    background: none; border: none; cursor: pointer; padding: 10px; z-index: 2100;
 }
 .hamburger, .hamburger::before, .hamburger::after {
     content: ''; display: block; width: 22px; height: 2px; background: #111827; transition: 0.3s;
@@ -102,32 +105,30 @@
 .hamburger::before { position: absolute; top: -7px; left: 0; }
 .hamburger::after { position: absolute; bottom: 7px; left: 0; }
 
-/* --- Mobile Drawer (Hidden off-screen to the right) --- */
+/* --- Mobile Drawer (The Fix) --- */
 .nav-drawer {
     position: fixed;
     top: 0;
-    right: -100%; /* Start completely off-screen */
+    right: -100%; /* Hidden off-screen */
     width: 280px;
     height: 100vh;
     background: #ffffff;
     z-index: 2000;
-    transition: right 0.3s ease;
-    padding: 2rem 1.5rem;
+    transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 5rem 1.5rem 2rem;
     box-shadow: -10px 0 30px rgba(0,0,0,0.1);
 }
 
 .nav-drawer.active { right: 0; } /* Slide in */
 
 .nav-menu { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem; }
-.drawer-section { font-size: 0.75rem; text-transform: uppercase; color: #9ca3af; font-weight: 800; letter-spacing: 1px; }
+.menu-label { font-size: 0.7rem; text-transform: uppercase; color: #9ca3af; font-weight: 800; }
 .nav-link { text-decoration: none; color: #374151; font-weight: 600; font-size: 1rem; }
 .nav-divider { border: 0; border-top: 1px solid #f3f4f6; margin: 0.5rem 0; }
 
-.drawer-footer { margin-top: auto; padding-top: 2rem; border-top: 1px solid #f3f4f6; }
-.btn-full { width: 100%; display: block; text-align: center; margin-bottom: 1.5rem; }
-.user-control { display: flex; flex-direction: column; line-height: 1.4; }
-.username { font-weight: 700; color: #111827; }
-.logout-link { color: #ef4444; text-decoration: none; font-size: 0.85rem; font-weight: 600; }
+.drawer-footer { margin-top: auto; padding-top: 1.5rem; border-top: 1px solid #f3f4f6; }
+.btn-full { width: 100%; display: block; text-align: center; margin-bottom: 1rem; }
+.logout-link { color: #ef4444; text-decoration: none; font-size: 0.8rem; font-weight: 700; }
 
 /* --- Overlay --- */
 .nav-overlay {
@@ -136,16 +137,16 @@
 }
 .nav-overlay.active { opacity: 1; pointer-events: auto; }
 
-/* --- Desktop Logic (Screen > 992px) --- */
+/* --- Desktop Styles (992px and up) --- */
 @media (min-width: 992px) {
     .menu-toggle { display: none; }
     .nav-drawer {
         position: static; width: auto; height: auto; background: none; 
         box-shadow: none; right: 0; padding: 0; transition: none;
     }
-    .nav-menu { flex-direction: row; align-items: center; gap: 2rem; }
-    .drawer-section, .nav-divider { display: none; }
-    .drawer-footer { border: none; padding: 0; margin: 0; flex-direction: row; display: flex; align-items: center; gap: 1rem; }
+    .nav-menu { flex-direction: row; align-items: center; gap: 1.5rem; }
+    .menu-label, .nav-divider, .drawer-footer hr { display: none; }
+    .drawer-footer { border: none; padding: 0; display: flex; align-items: center; gap: 1rem; }
     .btn-full { width: auto; margin-bottom: 0; }
 }
 </style>
