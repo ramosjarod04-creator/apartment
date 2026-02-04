@@ -1,159 +1,46 @@
-<nav class="navbar">
-    <div class="container nav-wrapper">
-        <div class="brand-section">
-            <a href="{% url 'dashboard' %}" class="logo">
-                <h2>Apartment Reservation</h2>
-            </a>
-            {% if user.is_staff %}
-                <span class="admin-label">Admin</span>
+<ul class="nav-menu">
+    <li><a href="{% url 'dashboard' %}" class="nav-link">Dashboard</a></li>
+    
+    {% if user.is_staff %}
+        <li><a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Panel</a></li>
+    {% endif %}
+    
+    <li>
+        <a href="{% if not user.is_staff %}{% url 'my_apartment' %}{% else %}{% url 'apartment_list' %}{% endif %}" class="nav-link">
+            {% if not user.is_staff %}My Apartment{% else %}Apartments{% endif %}
+        </a>
+    </li>
+    
+    <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
+
+    <div class="nav-actions">
+        <a href="{% url 'inbox' %}" class="nav-icon-link">
+            ✉️ Messages
+            {% if unread_messages_count > 0 %}
+                <span class="badge">{{ unread_messages_count }}</span>
             {% endif %}
-        </div>
-
-        <button class="menu-toggle" id="menu-toggle" aria-label="Open Menu">
-            <span class="hamburger-line"></span>
-        </button>
-
-        <div class="nav-sidebar" id="nav-sidebar">
-            <ul class="menu-list">
-                <li class="sidebar-header">Main Menu</li>
-                <li><a href="{% url 'dashboard' %}" class="menu-item">Dashboard</a></li>
-                
-                {% if user.is_staff %}
-                    <li><a href="{% url 'admin_dashboard' %}" class="menu-item">Admin Panel</a></li>
-                {% endif %}
-                
-                <li>
-                    <a href="{% if not user.is_staff %}{% url 'my_apartment' %}{% else %}{% url 'apartment_list' %}{% endif %}" class="menu-item">
-                        {% if not user.is_staff %}My Apartment{% else %}Apartments{% endif %}
-                    </a>
-                </li>
-                
-                <li><a href="{% url 'reservation_list' %}" class="menu-item">Reservations</a></li>
-
-                <hr class="sidebar-divider">
-
-                <div class="action-group">
-                    <a href="{% url 'inbox' %}" class="icon-link">
-                        <span>✉️ Messages</span>
-                        {% if unread_messages_count > 0 %}
-                            <span class="count-badge">{{ unread_messages_count }}</span>
-                        {% endif %}
-                    </a>
-                    
-                    <a href="{% url 'reservation_create' %}" class="btn btn-primary full-width">Book Now</a>
-                    
-                    <div class="user-footer">
-                        <span class="username">{{ user.username }}</span>
-                        <a href="{% url 'logout' %}" class="logout-link">Logout</a>
-                    </div>
-                </div>
-            </ul>
+        </a>
+        
+        <a href="{% url 'reservation_create' %}" class="btn btn-primary">Book Now</a>
+        
+        <div class="user-info">
+            <span class="username">{{ user.username }}</span>
+            <a href="{% url 'logout' %}" class="logout-link">Logout</a>
         </div>
     </div>
-</nav>
-
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-<script>
-    const toggle = document.getElementById('menu-toggle');
-    const sidebar = document.getElementById('nav-sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-
-    function toggleMenu() {
-        sidebar.classList.toggle('active');
-        overlay.classList.toggle('active');
-        // This stops the background from scrolling when the drawer is open
-        document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : 'auto';
-    }
-
-    toggle.addEventListener('click', toggleMenu);
-    overlay.addEventListener('click', toggleMenu);
-</script>
+</ul>
 
 <style>
-/* --- Base Header --- */
-.navbar {
-    background: #ffffff;
-    padding: 0.85rem 0;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
+    .nav-menu { display: flex; align-items: center; gap: 1rem; list-style: none; }
+    .nav-link { text-decoration: none; color: var(--gray-700); font-weight: 600; font-size: 0.95rem; }
+    .nav-actions { display: flex; align-items: center; gap: 1.5rem; margin-left: 1rem; }
+    .user-info { display: flex; flex-direction: column; line-height: 1.2; }
+    .logout-link { color: #ef4444; font-size: 0.8rem; text-decoration: none; font-weight: 700; }
+    .badge { background: #ef4444; color: white; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; }
 
-.nav-wrapper {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.brand-section { display: flex; align-items: center; gap: 8px; }
-.logo { text-decoration: none; color: #111827; }
-.logo h2 { margin: 0; font-size: 1.15rem; font-weight: 800; }
-
-.admin-label {
-    background: #fff7ed; color: #c2410c; padding: 2px 6px; 
-    border-radius: 4px; font-size: 0.65rem; font-weight: 800;
-}
-
-/* --- Hamburger Style --- */
-.menu-toggle {
-    display: block; background: none; border: none; cursor: pointer; padding: 10px; z-index: 2100;
-}
-.hamburger-line, .hamburger-line::before, .hamburger-line::after {
-    content: ''; display: block; width: 22px; height: 2px;
-    background: #111827; position: relative; transition: 0.3s;
-}
-.hamburger-line::before { position: absolute; top: -7px; left: 0; }
-.hamburger-line::after { position: absolute; bottom: 7px; left: 0; }
-
-/* --- Sidebar Drawer (Hidden by default) --- */
-.nav-sidebar {
-    position: fixed;
-    top: 0;
-    right: -100%; /* Off-screen */
-    width: 280px;
-    height: 100vh;
-    background: #ffffff;
-    z-index: 2000;
-    padding: 5rem 1.5rem 2rem;
-    transition: right 0.3s ease;
-    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
-}
-
-.nav-sidebar.active { right: 0; }
-
-.menu-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.25rem; }
-.sidebar-header { font-size: 0.75rem; text-transform: uppercase; color: #9ca3af; font-weight: 800; }
-.menu-item { text-decoration: none; color: #374151; font-weight: 600; font-size: 1rem; }
-.sidebar-divider { border: none; border-top: 1px solid #f3f4f6; margin: 0.5rem 0; }
-
-.action-group { margin-top: auto; display: flex; flex-direction: column; gap: 1.5rem; }
-.icon-link { text-decoration: none; color: #374151; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-.full-width { width: 100%; text-align: center; }
-
-.user-footer { border-top: 1px solid #f3f4f6; padding-top: 1.5rem; display: flex; flex-direction: column; }
-.username { font-weight: 800; color: #111827; }
-.logout-link { color: #ef4444; text-decoration: none; font-size: 0.85rem; font-weight: 700; margin-top: 4px; }
-
-/* --- Overlay --- */
-.sidebar-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.4); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s;
-}
-.sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-
-/* --- Desktop Logic --- */
-@media (min-width: 992px) {
-    .menu-toggle { display: none; }
-    .nav-sidebar {
-        position: static; width: auto; height: auto; background: none; 
-        box-shadow: none; right: 0; padding: 0; transition: none;
+    @media (max-width: 768px) {
+        .nav-menu { flex-direction: column; align-items: flex-start; gap: 2rem; }
+        .nav-actions { flex-direction: column; align-items: flex-start; margin-left: 0; width: 100%; }
+        .btn-primary { width: 100%; text-align: center; }
     }
-    .menu-list { flex-direction: row; align-items: center; gap: 1.5rem; }
-    .sidebar-header, .sidebar-divider, .user-footer .username { display: none; }
-    .action-group { flex-direction: row; margin: 0; align-items: center; }
-    .user-footer { border: none; padding: 0; }
-    .full-width { width: auto; }
-}
 </style>
