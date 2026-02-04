@@ -3,513 +3,190 @@
 {% block title %}My Apartment - Apartment Reservation{% endblock %}
 
 {% block content %}
-<div class="container" style="max-width: 1200px; margin: 2rem auto;">
+<div class="container dash-container">
     {% if has_apartment %}
-    <!-- Active Apartment View -->
-    <div class="apartment-header">
-        <h1> My Apartment</h1>
-        <p class="subtitle">Everything you need to know about your rental</p>
+    <div class="dash-header">
+        <div class="header-main">
+            <h1>My Apartment</h1>
+            <p>Unit {{ apartment.unit_number }} • {{ apartment.name }}</p>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'send_message' %}" class="btn btn-primary">Contact Admin</a>
+        </div>
     </div>
 
-    <div class="apartment-grid">
-        <!-- Apartment Details Card -->
-        <div class="info-card">
-            <div class="card-header">
-                <h2> Unit Information</h2>
-            </div>
-            <div class="card-body">
-                {% if apartment.image %}
-                <img src="{{ apartment.image.url }}" alt="Unit {{ apartment.unit_number }}" class="apartment-image">
+    <div class="status-bar {% if is_overdue %}status-critical{% elif days_until_payment <= 7 %}status-warning{% endif %}">
+        <div class="status-item">
+            <span class="status-label">Payment Status</span>
+            <span class="status-value">
+                {% if is_overdue %}
+                    Overdue ({{ days_overdue }} days)
+                {% elif days_until_payment <= 7 %}
+                    Due in {{ days_until_payment }} days
                 {% else %}
-                <div class="placeholder-image"></div>
+                    Up to date
+                {% endif %}
+            </span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Monthly Rent</span>
+            <span class="status-value">₱{{ apartment.price_per_month|floatformat:2 }}</span>
+        </div>
+        <div class="status-item">
+            <span class="status-label">Next Due Date</span>
+            <span class="status-value">{{ reservation.next_payment_due|date:"M d, Y"|default:"N/A" }}</span>
+        </div>
+    </div>
+
+    <div class="dash-grid">
+        <div class="dash-card">
+            <div class="card-title">Unit Details</div>
+            <div class="card-content">
+                {% if apartment.image %}
+                    <img src="{{ apartment.image.url }}" alt="Unit {{ apartment.unit_number }}" class="dash-img">
+                {% else %}
+                    <div class="dash-img-placeholder">No Image Available</div>
                 {% endif %}
                 
-                <div class="detail-row">
-                    <span class="label">Unit Number:</span>
-                    <span class="value">{{ apartment.unit_number }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Property Name:</span>
-                    <span class="value">{{ apartment.name }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Type:</span>
-                    <span class="value">{{ apartment.get_apartment_type_display }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Floor:</span>
-                    <span class="value">{{ apartment.floor }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Size:</span>
-                    <span class="value">{{ apartment.size_sqm }} sqm</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Bedrooms:</span>
-                    <span class="value">{{ apartment.bedrooms }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Bathrooms:</span>
-                    <span class="value">{{ apartment.bathrooms }}</span>
+                <div class="info-list">
+                    <div class="info-row"><span>Type</span><strong>{{ apartment.get_apartment_type_display }}</strong></div>
+                    <div class="info-row"><span>Floor</span><strong>{{ apartment.floor }}</strong></div>
+                    <div class="info-row"><span>Size</span><strong>{{ apartment.size_sqm }} sqm</strong></div>
+                    <div class="info-row"><span>Bedrooms</span><strong>{{ apartment.bedrooms }}</strong></div>
+                    <div class="info-row"><span>Bathrooms</span><strong>{{ apartment.bathrooms }}</strong></div>
                 </div>
             </div>
         </div>
 
-        <!-- Payment Information Card -->
-        <div class="info-card">
-            <div class="card-header {% if is_overdue %}overdue{% endif %}">
-                <h2> Payment Information</h2>
-            </div>
-            <div class="card-body">
-                <div class="payment-amount">
-                    <span class="amount-label">Monthly Rent</span>
-                    <span class="amount-value">₱{{ apartment.price_per_month|floatformat:2 }}</span>
+        <div class="dash-card">
+            <div class="card-title">Lease Agreement</div>
+            <div class="card-content">
+                <div class="info-list">
+                    <div class="info-row"><span>Move-in Date</span><strong>{{ reservation.check_in|date:"F d, Y" }}</strong></div>
+                    <div class="info-row"><span>Duration</span><strong>{{ months_stayed }} months</strong></div>
+                    <div class="info-row"><span>Lease Status</span><span class="badge badge-success">{{ reservation.get_status_display }}</span></div>
+                    
+                    {% if reservation.last_payment_date %}
+                    <div class="info-row"><span>Last Payment</span><strong>{{ reservation.last_payment_date|date:"M d, Y" }}</strong></div>
+                    {% endif %}
                 </div>
 
-                {% if reservation.next_payment_due %}
-                <div class="payment-due {% if is_overdue %}overdue-alert{% endif %}">
-                    <div class="due-icon"></div>
-                    <div class="due-info">
-                        <span class="due-label">Next Payment Due</span>
-                        <span class="due-date">{{ reservation.next_payment_due|date:"F d, Y" }}</span>
-                        {% if days_until_payment %}
-                            {% if is_overdue %}
-                            <span class="due-status overdue"> OVERDUE by {{ days_overdue }} days</span>
-                            {% elif days_until_payment <= 7 %}
-                            <span class="due-status warning"> Due in {{ days_until_payment }} days</span>
-                            {% else %}
-                            <span class="due-status ok">✓ Due in {{ days_until_payment }} days</span>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
-
-                {% if reservation.last_payment_date %}
-                <div class="detail-row">
-                    <span class="label">Last Payment:</span>
-                    <span class="value">{{ reservation.last_payment_date|date:"M d, Y" }}</span>
-                </div>
-                {% endif %}
-
-                <div class="payment-note">
-                    <strong> Payment Methods:</strong>
-                    <p>Please contact the admin through the messaging system for payment instructions.</p>
-                    <a href="{% url 'send_message' %}" class="btn btn-outline"> Message Admin</a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Lease Information Card -->
-        <div class="info-card">
-            <div class="card-header">
-                <h2> Lease Information</h2>
-            </div>
-            <div class="card-body">
-                <div class="detail-row">
-                    <span class="label">Move-in Date:</span>
-                    <span class="value">{{ reservation.check_in|date:"F d, Y" }}</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Duration:</span>
-                    <span class="value">{{ months_stayed }} months ({{ stay_duration_days }} days)</span>
-                </div>
-                <div class="detail-row">
-                    <span class="label">Status:</span>
-                    <span class="badge badge-success">{{ reservation.get_status_display }}</span>
-                </div>
-                
                 {% if reservation.special_requests %}
-                <div class="special-requests">
-                    <strong>Special Requests:</strong>
+                <div class="memo-box">
+                    <small>Special Requests</small>
                     <p>{{ reservation.special_requests }}</p>
                 </div>
                 {% endif %}
-
-                {% if reservation.reviewed_by %}
-                <div class="detail-row">
-                    <span class="label">Approved By:</span>
-                    <span class="value">{{ reservation.reviewed_by.get_full_name|default:reservation.reviewed_by.username }}</span>
+                
+                <div class="payment-instructions">
+                    <strong>How to pay?</strong>
+                    <p>Payments are currently handled via bank transfer or GCash. Message the admin to receive the latest account details.</p>
+                    <a href="{% url 'inbox' %}" class="btn btn-outline btn-sm">View Instructions</a>
                 </div>
-                {% endif %}
             </div>
         </div>
 
-        <!-- Amenities Card -->
-        <div class="info-card full-width">
-            <div class="card-header">
-                <h2> Amenities</h2>
-            </div>
-            <div class="card-body">
-                <div class="amenities-grid">
+        <div class="dash-card full-width">
+            <div class="card-title">Included Amenities</div>
+            <div class="card-content">
+                <div class="amenities-tag-cloud">
                     {% for amenity in apartment.get_amenities_list %}
-                    <div class="amenity-item">
-                        <span class="amenity-icon">✓</span>
-                        <span>{{ amenity }}</span>
-                    </div>
+                        <span class="amenity-tag">{{ amenity }}</span>
                     {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Actions Card -->
-        <div class="info-card full-width">
-            <div class="card-header">
-                <h2> Actions</h2>
-            </div>
-            <div class="card-body">
-                <div class="action-buttons">
-                    <a href="{% url 'send_message' %}" class="btn btn-primary"> Contact Admin</a>
-                    <a href="{% url 'apartment_detail' apartment.pk %}" class="btn btn-outline"> View Full Details</a>
-                    <a href="{% url 'inbox' %}" class="btn btn-outline"> My Messages</a>
                 </div>
             </div>
         </div>
     </div>
 
     {% else %}
-    <!-- No Active Apartment View -->
-    <div class="empty-state">
-        <div class="empty-icon"></div>
-        <h2>You don't have an active apartment yet</h2>
+    <div class="empty-dashboard">
+        <div class="empty-hero">No Active Rental</div>
+        <h1>Find your next home</h1>
+        <p>You don't have an active apartment reservation at the moment.</p>
         
         {% if pending_reservations %}
-        <p>You have pending reservation requests:</p>
-        <div class="pending-list">
-            {% for res in pending_reservations %}
-            <div class="pending-item">
-                <span>Unit {{ res.apartment.unit_number }} - {{ res.apartment.name }}</span>
-                <span class="badge badge-warning">Pending Approval</span>
+            <div class="pending-section">
+                <h3>Pending Requests</h3>
+                {% for res in pending_reservations %}
+                <div class="pending-card">
+                    <span>Unit {{ res.apartment.unit_number }} - {{ res.apartment.name }}</span>
+                    <span class="badge badge-warning">Awaiting Approval</span>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <p>Browse available apartments and make a reservation to get started!</p>
         {% endif %}
         
         <div class="empty-actions">
-            <a href="{% url 'apartment_list' %}" class="btn btn-primary">Browse Apartments</a>
-            <a href="{% url 'reservation_list' %}" class="btn btn-outline">View My Reservations</a>
+            <a href="{% url 'apartment_list' %}" class="btn btn-primary">Browse Available Units</a>
+            <a href="{% url 'reservation_list' %}" class="btn btn-outline">My Request History</a>
         </div>
     </div>
     {% endif %}
 </div>
 
 <style>
-    .apartment-header {
-        text-align: center;
-        margin-bottom: 3rem;
-    }
+    .dash-container { max-width: 1100px; margin: 2rem auto; }
 
-    .apartment-header h1 {
-        font-size: 2.5rem;
-        color: #1e293b;
-        margin-bottom: 0.5rem;
-    }
+    /* Header */
+    .dash-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; }
+    .header-main h1 { font-size: 2rem; color: var(--dark); margin: 0; }
+    .header-main p { color: var(--gray-500); margin: 0; font-weight: 500; }
 
-    .subtitle {
-        color: #64748b;
-        font-size: 1.1rem;
+    /* Status Bar */
+    .status-bar { 
+        display: grid; grid-template-columns: repeat(3, 1fr); 
+        background: white; padding: 1.5rem; border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm); margin-bottom: 2rem; border-left: 6px solid var(--primary);
     }
+    .status-critical { border-left-color: #ef4444; background: #fffafb; }
+    .status-warning { border-left-color: #f59e0b; background: #fffdfa; }
 
-    .apartment-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-        gap: 2rem;
-    }
+    .status-item { display: flex; flex-direction: column; }
+    .status-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--gray-500); font-weight: 700; }
+    .status-value { font-size: 1.25rem; font-weight: 800; color: var(--dark); }
+    .status-critical .status-value { color: #dc2626; }
 
-    .info-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
+    /* Grid & Cards */
+    .dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .dash-card { background: white; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); overflow: hidden; }
+    .full-width { grid-column: 1 / -1; }
+    
+    .card-title { padding: 1rem 1.5rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; color: var(--gray-500); }
+    .card-content { padding: 1.5rem; }
 
-    .info-card.full-width {
-        grid-column: 1 / -1;
-    }
+    .dash-img { width: 100%; height: 220px; object-fit: cover; border-radius: var(--radius-md); margin-bottom: 1rem; }
+    .dash-img-placeholder { width: 100%; height: 220px; background: var(--gray-100); display: flex; align-items: center; justify-content: center; color: var(--gray-400); border-radius: var(--radius-md); margin-bottom: 1rem; }
 
-    .card-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 1.5rem;
-    }
+    .info-list { display: flex; flex-direction: column; gap: 12px; }
+    .info-row { display: flex; justify-content: space-between; border-bottom: 1px solid var(--gray-50); padding-bottom: 8px; }
+    .info-row span { color: var(--gray-500); font-size: 0.9rem; }
+    .info-row strong { color: var(--dark); }
 
-    .card-header.overdue {
-        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    }
+    /* Amenities */
+    .amenities-tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+    .amenity-tag { background: var(--gray-100); color: var(--gray-700); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
 
-    .card-header h2 {
-        margin: 0;
-        font-size: 1.25rem;
-    }
+    .memo-box { background: var(--gray-50); padding: 1rem; border-radius: var(--radius-md); margin-top: 1rem; }
+    .memo-box small { text-transform: uppercase; font-weight: 800; color: var(--gray-400); font-size: 0.7rem; }
+    .memo-box p { margin: 4px 0 0 0; font-size: 0.9rem; color: var(--gray-700); }
 
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    .apartment-image {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-    }
-
-    .placeholder-image {
-        width: 100%;
-        height: 200px;
-        background: #f1f5f9;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 4rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .detail-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid #f1f5f9;
-    }
-
-    .detail-row:last-child {
-        border-bottom: none;
-    }
-
-    .label {
-        color: #64748b;
-        font-weight: 500;
-    }
-
-    .value {
-        color: #1e293b;
-        font-weight: 600;
-    }
-
-    .payment-amount {
-        text-align: center;
-        padding: 2rem;
-        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-        border-radius: 12px;
-        margin-bottom: 1.5rem;
-    }
-
-    .amount-label {
-        display: block;
-        color: #64748b;
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .amount-value {
-        display: block;
-        font-size: 2.5rem;
-        font-weight: 800;
-        color: #2563eb;
-    }
-
-    .payment-due {
-        display: flex;
-        gap: 1rem;
-        padding: 1.5rem;
-        background: #f8fafc;
-        border-radius: 12px;
-        margin-bottom: 1rem;
-    }
-
-    .payment-due.overdue-alert {
-        background: #fef2f2;
-        border: 2px solid #ef4444;
-    }
-
-    .due-icon {
-        font-size: 2rem;
-    }
-
-    .due-info {
-        flex: 1;
-    }
-
-    .due-label {
-        display: block;
-        color: #64748b;
-        font-size: 0.9rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .due-date {
-        display: block;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 0.5rem;
-    }
-
-    .due-status {
-        display: inline-block;
-        padding: 0.25rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .due-status.ok {
-        background: #f0fdf4;
-        color: #166534;
-    }
-
-    .due-status.warning {
-        background: #fffbeb;
-        color: #92400e;
-    }
-
-    .due-status.overdue {
-        background: #fef2f2;
-        color: #991b1b;
-    }
-
-    .payment-note {
-        margin-top: 1.5rem;
-        padding: 1rem;
-        background: #f8fafc;
-        border-radius: 8px;
-    }
-
-    .payment-note strong {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #1e293b;
-    }
-
-    .payment-note p {
-        margin: 0.5rem 0;
-        color: #64748b;
-        font-size: 0.9rem;
-    }
-
-    .special-requests {
-        margin-top: 1rem;
-        padding: 1rem;
-        background: #f8fafc;
-        border-radius: 8px;
-    }
-
-    .special-requests strong {
-        display: block;
-        margin-bottom: 0.5rem;
-        color: #1e293b;
-    }
-
-    .special-requests p {
-        margin: 0;
-        color: #475569;
-    }
-
-    .amenities-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 1rem;
-    }
-
-    .amenity-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.75rem;
-        background: #f8fafc;
-        border-radius: 8px;
-    }
-
-    .amenity-icon {
-        color: #10b981;
-        font-weight: 700;
-    }
-
-    .action-buttons {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-
-    .badge-success {
-        background: #f0fdf4;
-        color: #166534;
-        padding: 0.25rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
-
-    .badge-warning {
-        background: #fffbeb;
-        color: #92400e;
-        padding: 0.25rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        font-weight: 600;
-    }
+    .payment-instructions { margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--gray-200); }
+    .payment-instructions strong { display: block; margin-bottom: 4px; }
+    .payment-instructions p { font-size: 0.85rem; color: var(--gray-500); margin-bottom: 12px; }
 
     /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 4rem 2rem;
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
+    .empty-dashboard { text-align: center; padding: 5rem 2rem; background: white; border-radius: var(--radius-xl); border: 2px dashed var(--gray-200); }
+    .empty-hero { font-weight: 900; font-size: 1.5rem; color: var(--gray-300); text-transform: uppercase; margin-bottom: 1rem; }
+    .pending-section { max-width: 500px; margin: 2rem auto; text-align: left; }
+    .pending-card { display: flex; justify-content: space-between; padding: 1rem; background: var(--gray-50); border-radius: var(--radius-md); margin-top: 0.5rem; }
 
-    .empty-icon {
-        font-size: 5rem;
-        margin-bottom: 1rem;
-    }
-
-    .empty-state h2 {
-        color: #1e293b;
-        margin-bottom: 1rem;
-    }
-
-    .empty-state p {
-        color: #64748b;
-        margin-bottom: 2rem;
-    }
-
-    .pending-list {
-        max-width: 600px;
-        margin: 2rem auto;
-    }
-
-    .pending-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background: #f8fafc;
-        border-radius: 8px;
-        margin-bottom: 0.5rem;
-    }
-
-    .empty-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
+    /* Mobile */
     @media (max-width: 768px) {
-        .apartment-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-        }
-
-        .action-buttons .btn {
-            width: 100%;
-        }
+        .dash-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .status-bar { grid-template-columns: 1fr; gap: 1rem; }
+        .dash-grid { grid-template-columns: 1fr; }
+        .header-actions { width: 100%; }
+        .header-actions .btn { width: 100%; }
     }
 </style>
 {% endblock %}
