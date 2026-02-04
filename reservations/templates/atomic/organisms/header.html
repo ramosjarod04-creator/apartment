@@ -26,10 +26,12 @@
                         {% if not user.is_staff %}My Apartment{% else %}Apartments{% endif %}
                     </a>
                 </li>
+                
                 <li><a href="{% url 'reservation_list' %}" class="nav-link">Reservations</a></li>
                 
                 <li class="nav-icons-group">
                     <a href="{% url 'inbox' %}" class="nav-icon-link">
+                        <span class="icon-label">Messages</span>
                         <span class="icon-img">✉️</span>
                         {% if unread_messages_count > 0 %}
                         <span class="notification-badge">{{ unread_messages_count }}</span>
@@ -37,6 +39,7 @@
                     </a>
 
                     <a href="{% url 'notifications' %}" class="nav-icon-link">
+                        <span class="icon-label">Notifications</span>
                         <span class="icon-img">🔔</span>
                         {% if unread_notifications > 0 %}
                         <span class="notification-badge">{{ unread_notifications }}</span>
@@ -78,14 +81,14 @@
 </script>
 
 <style>
-/* --- Base Desktop Styles --- */
+/* --- Core Layout --- */
 .navbar {
     background: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: sticky;
     top: 0;
     z-index: 1000;
-    padding: 0.75rem 0;
+    padding: 0.85rem 0;
 }
 
 .nav-container {
@@ -94,99 +97,63 @@
     align-items: center;
 }
 
-.nav-brand { display: flex; align-items: center; gap: 0.5rem; }
+.nav-brand { display: flex; align-items: center; gap: 8px; }
 .brand-link { text-decoration: none; color: var(--dark); }
-.brand-link h2 { margin: 0; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; }
+.brand-link h2 { margin: 0; font-size: 1.15rem; font-weight: 800; white-space: nowrap; }
 
-.nav-menu {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+.admin-badge {
+    background: #fff7ed; color: #c2410c; padding: 2px 6px; 
+    border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
 }
 
-.nav-link {
-    text-decoration: none;
-    color: var(--gray-600);
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-}
-
-.nav-link:hover { color: var(--primary); }
-
+/* --- Menu Desktop --- */
+.nav-menu { display: flex; align-items: center; gap: 1.5rem; list-style: none; margin: 0; padding: 0; }
+.nav-link { text-decoration: none; color: var(--gray-600); font-weight: 600; font-size: 0.9rem; }
 .nav-icons-group { display: flex; gap: 1rem; }
-.nav-icon-link { position: relative; text-decoration: none; font-size: 1.2rem; }
+.icon-label { display: none; } /* Hidden on desktop */
 
-.notification-badge {
-    position: absolute; top: -5px; right: -8px;
-    background: #ef4444; color: white;
-    font-size: 0.6rem; font-weight: 800;
-    height: 16px; min-width: 16px;
-    border-radius: 10px; border: 2px solid white;
-    display: flex; align-items: center; justify-content: center;
+.nav-actions { 
+    display: flex; align-items: center; gap: 1rem; 
+    border-left: 1px solid var(--gray-100); padding-left: 1.5rem; 
 }
 
-.nav-actions {
-    display: flex; align-items: center; gap: 1rem;
-    border-left: 1px solid var(--gray-100); padding-left: 1.5rem;
+/* --- Hamburger Icon Styling --- */
+.menu-toggle {
+    display: none; background: none; border: none; cursor: pointer; padding: 5px;
 }
 
-.user-meta { display: flex; flex-direction: column; line-height: 1.2; }
-.nav-user { font-size: 0.85rem; font-weight: 700; color: var(--dark); }
-.logout-link { font-size: 0.75rem; color: #ef4444; text-decoration: none; font-weight: 600; }
-
-/* Hide Mobile Elements by Default */
-.menu-toggle, .nav-overlay { display: none; }
-
-/* --- Tablet/Mobile Responsive (The Drawer) --- */
 @media (max-width: 992px) {
-    .menu-toggle {
-        display: block;
-        background: none; border: none; cursor: pointer;
-        padding: 10px; z-index: 1100;
+    .menu-toggle { display: block; z-index: 1100; }
+    .hamburger, .hamburger::before, .hamburger::after {
+        content: ''; display: block; width: 22px; height: 2px;
+        background: var(--dark); transition: all 0.3s;
     }
-    
-    .hamburger {
-        display: block; width: 24px; height: 2px;
-        background: var(--dark); position: relative;
-    }
-    .hamburger::before, .hamburger::after {
-        content: ''; position: absolute; width: 24px; height: 2px;
-        background: var(--dark); left: 0;
-    }
-    .hamburger::before { top: -8px; }
-    .hamburger::after { bottom: -8px; }
+    .hamburger { position: relative; }
+    .hamburger::before { position: absolute; top: -7px; }
+    .hamburger::after { position: absolute; bottom: -7px; }
 
+    /* Drawer Sidebar */
     .nav-menu-wrapper {
-        position: fixed; top: 0; right: -300px; /* Hidden off-screen */
-        width: 280px; height: 100vh;
-        background: white; z-index: 1050;
-        box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-        transition: right 0.3s ease-in-out;
-        padding: 80px 2rem 2rem 2rem;
+        position: fixed; top: 0; right: -100%; width: 280px; height: 100vh;
+        background: white; z-index: 1050; transition: right 0.3s ease;
+        padding: 5rem 1.5rem 2rem; box-shadow: -10px 0 30px rgba(0,0,0,0.1);
     }
-
     .nav-menu-wrapper.active { right: 0; }
 
-    .nav-menu { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
-
-    .nav-actions {
-        flex-direction: column; align-items: flex-start;
-        border-left: none; padding-left: 0; border-top: 1px solid var(--gray-100);
-        padding-top: 1.5rem; width: 100%;
+    .nav-menu { flex-direction: column; align-items: flex-start; width: 100%; }
+    .nav-icons-group { flex-direction: column; width: 100%; gap: 1.5rem; }
+    .icon-label { display: inline; margin-right: 8px; font-size: 0.9rem; font-weight: 600; color: var(--gray-600); }
+    
+    .nav-actions { 
+        flex-direction: column; width: 100%; border-left: none; 
+        border-top: 1px solid var(--gray-100); padding: 1.5rem 0 0 0; margin-top: 0.5rem;
     }
+    .nav-actions li, .nav-actions .btn { width: 100%; }
 
     .nav-overlay {
-        display: block; position: fixed; top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5); z-index: 1040;
-        opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.4); z-index: 1040; display: none;
     }
-    .nav-overlay.active { opacity: 1; pointer-events: auto; }
-    
-    .no-scroll { overflow: hidden; } /* Prevents background scrolling when menu is open */
+    .nav-overlay.active { display: block; }
 }
 </style>
