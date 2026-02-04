@@ -1,12 +1,32 @@
 {% extends 'base.html' %}
 
-{% block title %}Reservations - Apartment Reservation{% endblock %}
+{% block title %}My Reservations - Apartment Reservation{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container res-list-container">
     <div class="page-header">
-        <h1>All Reservations</h1>
-        <a href="{% url 'reservation_create' %}" class="btn btn-primary">+ New Reservation</a>
+        <div class="header-text">
+            <h1>Reservations</h1>
+            <p>Track your housing applications and active leases.</p>
+        </div>
+        <div class="header-actions">
+            <a href="{% url 'reservation_create' %}" class="btn btn-primary">
+                <span>+ New Reservation</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="res-summary">
+        <div class="stat-pill">
+            <span class="stat-count">{{ reservations.count }}</span>
+            <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-pill">
+            <span class="stat-count">
+                {% if user.is_staff %}Admin View{% else %}Resident View{% endif %}
+            </span>
+            <span class="stat-label">Mode</span>
+        </div>
     </div>
 
     {% if reservations %}
@@ -16,11 +36,70 @@
         {% endfor %}
     </div>
     {% else %}
-    <div class="empty-state">
-        <h3>No reservations found</h3>
-        <p>Ready to book your apartment?</p>
-        <a href="{% url 'apartment_list' %}" class="btn btn-primary">Browse Apartments</a>
+    <div class="empty-list-card">
+        <div class="empty-visual">No Data Found</div>
+        <h3>No reservations yet</h3>
+        <p>You haven't made any apartment reservations. Start by browsing our available units.</p>
+        <div class="empty-actions">
+            <a href="{% url 'apartment_list' %}" class="btn btn-primary">Browse Units</a>
+            <a href="{% url 'reservation_create' %}" class="btn btn-outline">Start Application</a>
+        </div>
     </div>
     {% endif %}
 </div>
+
+<style>
+    .res-list-container { max-width: 1100px; margin: 2rem auto; }
+
+    /* Page Header */
+    .page-header { 
+        display: flex; justify-content: space-between; align-items: center; 
+        margin-bottom: 2rem; gap: 1rem;
+    }
+    .header-text h1 { margin: 0; font-size: 2rem; color: var(--dark); }
+    .header-text p { margin: 4px 0 0 0; color: var(--gray-500); }
+
+    /* Summary Bar */
+    .res-summary { 
+        display: flex; gap: 15px; margin-bottom: 2rem; 
+        padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-100);
+    }
+    .stat-pill { 
+        background: white; border: 1px solid var(--gray-200); 
+        padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 10px;
+    }
+    .stat-count { font-weight: 800; color: var(--primary); font-size: 0.9rem; }
+    .stat-label { color: var(--gray-500); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; }
+
+    /* Grid Layout */
+    .reservations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    /* Empty State */
+    .empty-list-card {
+        text-align: center; background: white; padding: 5rem 2rem;
+        border-radius: var(--radius-xl); border: 2px dashed var(--gray-200);
+    }
+    .empty-visual { 
+        font-weight: 900; font-size: 0.85rem; color: var(--gray-300); 
+        text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1.5rem;
+    }
+    .empty-list-card h3 { margin: 0 0 10px 0; color: var(--dark); }
+    .empty-list-card p { color: var(--gray-500); margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto; }
+    .empty-actions { display: flex; gap: 12px; justify-content: center; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .page-header { flex-direction: column; align-items: flex-start; }
+        .header-actions { width: 100%; }
+        .header-actions .btn { width: 100%; justify-content: center; }
+        .reservations-grid { grid-template-columns: 1fr; }
+        .res-summary { overflow-x: auto; padding-bottom: 1rem; }
+        .stat-pill { flex-shrink: 0; }
+    }
+</style>
 {% endblock %}
