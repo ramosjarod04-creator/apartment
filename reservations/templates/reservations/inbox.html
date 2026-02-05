@@ -3,81 +3,164 @@
 {% block title %}Messages - Apartment Reservation{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="page-header">
-        <div class="header-text">
-            <h1>Messages</h1>
-            <p>Manage your conversations with tenants and staff</p>
+<div class="messages-wrapper">
+    <div class="container">
+        <div class="page-header">
+            <div class="header-text">
+                <h1>Messages</h1>
+                <p>Manage your conversations with tenants and staff</p>
+            </div>
+            <a href="{% url 'send_message' %}" class="btn btn-primary">+ New Message</a>
         </div>
-        <a href="{% url 'send_message' %}" class="btn btn-primary">+ New Message</a>
-    </div>
 
-    <div class="inbox-wrapper">
-        {% if conversation_data %}
-            <div class="conversation-list">
-                {% for data in conversation_data %}
-                <div class="conversation-row {% if data.unread_count > 0 %}unread{% endif %}" 
-                     onclick="window.location='{% url 'message_detail' data.conversation.pk %}'">
-                    
-                    <div class="conv-avatar">
-                        <span class="avatar-circle">
-                            {{ data.other_user.username|slice:":1"|upper }}
-                        </span>
-                    </div>
-                    
-                    <div class="conv-main">
-                        <div class="conv-header">
-                            <div class="user-info">
-                                <strong class="conv-user">{{ data.other_user.get_full_name|default:data.other_user.username }}</strong>
-                                {% if data.other_user.is_staff %}
-                                    <span class="badge-admin">Staff</span>
-                                {% endif %}
+        <div class="inbox-wrapper">
+            {% if conversation_data %}
+                <div class="conversation-list">
+                    {% for data in conversation_data %}
+                    <div class="conversation-row {% if data.unread_count > 0 %}unread{% endif %}" 
+                         onclick="window.location='{% url 'message_detail' data.conversation.pk %}'">
+                        
+                        <div class="conv-avatar">
+                            <span class="avatar-circle">
+                                {{ data.other_user.username|slice:":1"|upper }}
+                            </span>
+                        </div>
+                        
+                        <div class="conv-main">
+                            <div class="conv-header">
+                                <div class="user-info">
+                                    <strong class="conv-user">{{ data.other_user.get_full_name|default:data.other_user.username }}</strong>
+                                    {% if data.other_user.is_staff %}
+                                        <span class="badge-admin">Staff</span>
+                                    {% endif %}
+                                </div>
+                                <div class="conv-meta-mobile">
+                                    {% if data.last_message %}
+                                        {{ data.last_message.created_at|timesince }} ago
+                                    {% endif %}
+                                </div>
                             </div>
-                            <div class="conv-meta-mobile">
+                            
+                            <div class="conv-subject">{{ data.conversation.subject }}</div>
+                            
+                            <div class="conv-preview">
                                 {% if data.last_message %}
-                                    {{ data.last_message.created_at|timesince }} ago
+                                    <span class="preview-sender">
+                                        {% if data.last_message.sender == user %}You:{% else %}{{ data.last_message.sender.username }}:{% endif %}
+                                    </span>
+                                    <span class="preview-text">{{ data.last_message.content|truncatechars:60 }}</span>
                                 {% endif %}
                             </div>
                         </div>
                         
-                        <div class="conv-subject">{{ data.conversation.subject }}</div>
-                        
-                        <div class="conv-preview">
+                        <div class="conv-meta-desktop">
+                            {% if data.unread_count > 0 %}
+                                <span class="unread-badge">{{ data.unread_count }}</span>
+                            {% endif %}
                             {% if data.last_message %}
-                                <span class="preview-sender">
-                                    {% if data.last_message.sender == user %}You:{% else %}{{ data.last_message.sender.username }}:{% endif %}
-                                </span>
-                                <span class="preview-text">{{ data.last_message.content|truncatechars:60 }}</span>
+                                <span class="conv-date">{{ data.last_message.created_at|timesince }} ago</span>
                             {% endif %}
                         </div>
                     </div>
-                    
-                    <div class="conv-meta-desktop">
-                        {% if data.unread_count > 0 %}
-                            <span class="unread-badge">{{ data.unread_count }}</span>
-                        {% endif %}
-                        {% if data.last_message %}
-                            <span class="conv-date">{{ data.last_message.created_at|timesince }} ago</span>
-                        {% endif %}
-                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state">
-                <div class="empty-visual">No Messages</div>
-                <h3>No conversations yet</h3>
-                <p>Start a conversation by clicking "New Message" above</p>
-            </div>
-        {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-visual">No Messages</div>
+                    <h3>No conversations yet</h3>
+                    <p>Start a conversation by clicking "New Message" above</p>
+                    <a href="{% url 'send_message' %}" class="btn btn-primary">Send Your First Message</a>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 
 <style>
-    /* Wrapper */
+    :root {
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --dark: #1e293b;
+        --gray-700: #334155;
+        --gray-500: #64748b;
+        --gray-400: #94a3b8;
+        --gray-300: #cbd5e1;
+        --gray-200: #e2e8f0;
+        --gray-100: #f1f5f9;
+        --gray-50: #f8fafc;
+        --radius-xl: 16px;
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    /* WRAPPER FOR PROPER SPACING */
+    .messages-wrapper {
+        background-color: var(--gray-50);
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 0 20px;
+    }
+
+    .messages-wrapper .container {
+        width: 100%;
+        max-width: 1200px;
+        padding: 2rem 0;
+    }
+
+    /* PAGE HEADER */
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        gap: 1rem;
+    }
+
+    .header-text h1 {
+        margin: 0;
+        font-size: 2rem;
+        color: var(--dark);
+        font-weight: 700;
+    }
+
+    .header-text p {
+        margin: 6px 0 0 0;
+        color: var(--gray-500);
+        font-size: 1rem;
+    }
+
+    /* CONSISTENT BUTTON STYLING */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(37, 99, 235, 0.4);
+    }
+
+    /* INBOX WRAPPER */
     .inbox-wrapper {
-        max-width: 1000px;
-        margin: 1.5rem auto;
         background: white;
         border-radius: var(--radius-xl);
         box-shadow: var(--shadow-md);
@@ -85,9 +168,12 @@
         border: 1px solid var(--gray-200);
     }
 
-    .conversation-list { display: flex; flex-direction: column; }
+    .conversation-list { 
+        display: flex; 
+        flex-direction: column; 
+    }
 
-    /* Row Layout */
+    /* CONVERSATION ROW LAYOUT */
     .conversation-row {
         display: grid;
         grid-template-columns: 64px 1fr 140px;
@@ -95,70 +181,279 @@
         padding: 1.25rem;
         border-bottom: 1px solid var(--gray-100);
         cursor: pointer;
-        transition: background 0.2s;
+        transition: all 0.2s ease;
         align-items: center;
     }
 
-    .conversation-row:hover { background: var(--gray-50); }
+    .conversation-row:last-child {
+        border-bottom: none;
+    }
+
+    .conversation-row:hover { 
+        background: var(--gray-50);
+        transform: translateX(2px);
+    }
 
     .conversation-row.unread {
-        background: #f0f7ff;
+        background: #eff6ff;
         border-left: 4px solid var(--primary);
     }
 
-    /* Avatar */
+    .conversation-row.unread:hover {
+        background: #dbeafe;
+    }
+
+    /* AVATAR */
+    .conv-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .avatar-circle {
         width: 48px;
         height: 48px;
         border-radius: 50%;
-        background: var(--dark);
+        background: linear-gradient(135deg, var(--primary), var(--primary-hover));
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
         font-weight: 700;
         font-size: 1.1rem;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
     }
 
-    /* Main Content */
-    .conv-main { min-width: 0; }
-    .conv-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .user-info { display: flex; align-items: center; gap: 8px; }
-    
-    .conv-user { color: var(--dark); font-size: 1rem; }
-    .conv-subject { color: var(--primary); font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; }
-    .conv-preview { color: var(--gray-500); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .preview-sender { font-weight: 700; color: var(--gray-700); }
+    /* MAIN CONTENT */
+    .conv-main { 
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
 
-    /* Meta & Badges */
-    .conv-meta-desktop { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-    .conv-meta-mobile { display: none; font-size: 0.75rem; color: var(--gray-400); }
-    .conv-date { color: var(--gray-400); font-size: 0.8rem; }
+    .conv-header { 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+    }
+
+    .user-info { 
+        display: flex; 
+        align-items: center; 
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .conv-user { 
+        color: var(--dark); 
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .conv-subject { 
+        color: var(--primary); 
+        font-weight: 600; 
+        font-size: 0.9rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .conv-preview { 
+        color: var(--gray-500); 
+        font-size: 0.85rem; 
+        white-space: nowrap; 
+        overflow: hidden; 
+        text-overflow: ellipsis;
+        line-height: 1.4;
+    }
+
+    .preview-sender { 
+        font-weight: 700; 
+        color: var(--gray-700); 
+    }
+
+    .preview-text {
+        color: var(--gray-500);
+    }
+
+    /* META & BADGES */
+    .conv-meta-desktop { 
+        text-align: right; 
+        display: flex; 
+        flex-direction: column; 
+        align-items: flex-end; 
+        gap: 8px;
+    }
+
+    .conv-meta-mobile { 
+        display: none; 
+        font-size: 0.75rem; 
+        color: var(--gray-400);
+        font-weight: 500;
+    }
+
+    .conv-date { 
+        color: var(--gray-400); 
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
 
     .badge-admin { 
-        background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; 
-        font-size: 0.65rem; font-weight: 800; text-transform: uppercase; 
+        background: #fef3c7; 
+        color: #92400e; 
+        padding: 3px 8px; 
+        border-radius: 4px; 
+        font-size: 0.65rem; 
+        font-weight: 800; 
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .unread-badge {
-        background: var(--primary); color: white; padding: 2px 8px; border-radius: 10px;
-        font-size: 0.7rem; font-weight: 800;
+        background: var(--primary); 
+        color: white; 
+        padding: 3px 8px; 
+        border-radius: 10px;
+        font-size: 0.7rem; 
+        font-weight: 800;
+        min-width: 20px;
+        text-align: center;
     }
 
-    /* Empty State */
-    .empty-state { text-align: center; padding: 5rem 2rem; background: var(--gray-50); }
+    /* EMPTY STATE */
+    .empty-state { 
+        text-align: center; 
+        padding: 5rem 2rem; 
+        background: var(--gray-50);
+    }
+
     .empty-visual { 
-        font-weight: 800; font-size: 1rem; color: var(--gray-300); 
-        text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;
+        font-weight: 800; 
+        font-size: 0.9rem; 
+        color: var(--gray-300); 
+        text-transform: uppercase; 
+        letter-spacing: 2px; 
+        margin-bottom: 1.5rem;
     }
 
-    /* Mobile Adjustments */
+    .empty-state h3 {
+        color: var(--dark);
+        font-size: 1.5rem;
+        margin: 0 0 10px 0;
+        font-weight: 700;
+    }
+
+    .empty-state p {
+        color: var(--gray-500);
+        margin: 0 0 2rem 0;
+        font-size: 1rem;
+    }
+
+    /* RESPONSIVE DESIGN */
     @media (max-width: 768px) {
-        .conversation-row { grid-template-columns: 50px 1fr; padding: 1rem; }
-        .conv-meta-desktop { display: none; }
-        .conv-meta-mobile { display: block; }
-        .avatar-circle { width: 40px; height: 40px; font-size: 1rem; }
-        .conv-preview { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        .messages-wrapper {
+            padding: 0 16px;
+        }
+
+        .messages-wrapper .container {
+            padding: 1.5rem 0;
+        }
+
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header-text h1 {
+            font-size: 1.75rem;
+        }
+
+        .page-header .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .inbox-wrapper {
+            border-radius: 12px;
+        }
+
+        .conversation-row { 
+            grid-template-columns: 50px 1fr; 
+            padding: 1rem;
+            gap: 0.75rem;
+        }
+
+        .conversation-row:hover {
+            transform: none;
+        }
+
+        .conv-meta-desktop { 
+            display: none; 
+        }
+
+        .conv-meta-mobile { 
+            display: block; 
+        }
+
+        .avatar-circle { 
+            width: 40px; 
+            height: 40px; 
+            font-size: 0.95rem; 
+        }
+
+        .conv-subject {
+            font-size: 0.85rem;
+        }
+
+        .conv-preview { 
+            white-space: normal; 
+            display: -webkit-box; 
+            -webkit-line-clamp: 2; 
+            -webkit-box-orient: vertical;
+            font-size: 0.8rem;
+        }
+
+        .empty-state {
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+        }
+
+        .empty-state .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header-text h1 {
+            font-size: 1.5rem;
+        }
+
+        .header-text p {
+            font-size: 0.9rem;
+        }
+
+        .conversation-row {
+            padding: 0.875rem;
+        }
+
+        .avatar-circle {
+            width: 36px;
+            height: 36px;
+            font-size: 0.85rem;
+        }
+
+        .conv-user {
+            font-size: 0.9rem;
+        }
+
+        .empty-state {
+            padding: 2.5rem 1rem;
+        }
     }
 </style>
 {% endblock %}
