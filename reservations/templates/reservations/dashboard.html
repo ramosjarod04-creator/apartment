@@ -3,95 +3,97 @@
 {% block title %}Dashboard - Property Manager{% endblock %}
 
 {% block content %}
-<div class="container dashboard">
-    <div class="page-header">
-        <div class="header-text">
-            <h1 class="main-title">Dashboard</h1>
-            <p class="subtitle">Welcome back, {{ user.first_name|default:user.username }}!</p>
+<div class="dashboard-wrapper">
+    <div class="container dashboard">
+        <div class="page-header">
+            <div class="header-text">
+                <h1 class="main-title">Dashboard</h1>
+                <p class="subtitle">Welcome back, {{ user.first_name|default:user.username }}!</p>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'reservation_create' %}" class="btn-primary-style mobile-full-width">+ New Booking</a>
+            </div>
         </div>
-        <div class="header-actions">
-            <a href="{% url 'reservation_create' %}" class="btn-primary-style mobile-full-width">+ New Booking</a>
-        </div>
-    </div>
 
-    <div class="stats-grid">
-        <div class="stat-card primary-border">
-            <div class="stat-info">
-                <span class="stat-label">Total Units</span>
-                <h3 class="stat-value">{{ total_apartments }}</h3>
-            </div>
-        </div>
-        <div class="stat-card success-border">
-            <div class="stat-info">
-                <span class="stat-label">Available</span>
-                <h3 class="stat-value">{{ available_apartments }}</h3>
-            </div>
-        </div>
-        <div class="stat-card warning-border">
-            <div class="stat-info">
-                <span class="stat-label">Pending</span>
-                <h3 class="stat-value">{{ pending_reservations }}</h3>
-            </div>
-        </div>
-        <div class="stat-card info-border">
-            <div class="stat-info">
-                <span class="stat-label">Approved</span>
-                <h3 class="stat-value">{{ approved_reservations }}</h3>
-            </div>
-        </div>
-    </div>
-
-    <div class="dashboard-main-grid">
-        <div class="dashboard-column shadow-card">
-            <div class="column-header">
-                <h2>Recent Reservations</h2>
-                <a href="{% url 'reservation_list' %}" class="link-action">View All Details</a>
-            </div>
-
-            {% if recent_reservations %}
-            <div class="activity-feed-container">
-                <div class="activity-feed">
-                    {% for reservation in recent_reservations %}
-                    <div class="activity-item">
-                        <div class="activity-status-indicator {{ reservation.status }}"></div>
-                        <div class="activity-content">
-                            <p><strong>Unit {{ reservation.apartment.unit_number }}</strong> reserved by {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
-                            <span class="activity-time">{{ reservation.created_at|date:"M d, Y" }}</span>
-                        </div>
-                        <span class="badge-status {{ reservation.status }}">{{ reservation.get_status_display }}</span>
-                    </div>
-                    {% endfor %}
+        <div class="stats-grid">
+            <div class="stat-card primary-border">
+                <div class="stat-info">
+                    <span class="stat-label">Total Units</span>
+                    <h3 class="stat-value">{{ total_apartments }}</h3>
                 </div>
             </div>
-            {% else %}
-            <div class="empty-placeholder">
-                <p>No recent activity found.</p>
+            <div class="stat-card success-border">
+                <div class="stat-info">
+                    <span class="stat-label">Available</span>
+                    <h3 class="stat-value">{{ available_apartments }}</h3>
+                </div>
             </div>
-            {% endif %}
+            <div class="stat-card warning-border">
+                <div class="stat-info">
+                    <span class="stat-label">Pending</span>
+                    <h3 class="stat-value">{{ pending_reservations }}</h3>
+                </div>
+            </div>
+            <div class="stat-card info-border">
+                <div class="stat-info">
+                    <span class="stat-label">Approved</span>
+                    <h3 class="stat-value">{{ approved_reservations }}</h3>
+                </div>
+            </div>
         </div>
 
-        <div class="dashboard-column shadow-card">
-            <div class="column-header">
-                <h2>Featured Units</h2>
-                <a href="{% url 'apartment_list' %}" class="link-action">Browse All</a>
+        <div class="dashboard-main-grid">
+            <div class="dashboard-column shadow-card">
+                <div class="column-header">
+                    <h2>Recent Reservations</h2>
+                    <a href="{% url 'reservation_list' %}" class="link-action">View All Details</a>
+                </div>
+
+                {% if recent_reservations %}
+                <div class="activity-feed-container">
+                    <div class="activity-feed">
+                        {% for reservation in recent_reservations %}
+                        <div class="activity-item">
+                            <div class="activity-status-indicator {{ reservation.status }}"></div>
+                            <div class="activity-content">
+                                <p><strong>Unit {{ reservation.apartment.unit_number }}</strong> reserved by {{ reservation.user.get_full_name|default:reservation.user.username }}</p>
+                                <span class="activity-time">{{ reservation.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <span class="badge-status {{ reservation.status }}">{{ reservation.get_status_display }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <div class="empty-placeholder">
+                    <p>No recent activity found.</p>
+                </div>
+                {% endif %}
             </div>
 
-            <div class="mini-unit-list">
-                {% for apartment in featured_apartments|slice:":3" %}
-                <a href="{% url 'apartment_detail' apartment.pk %}" class="mini-unit-item">
-                    {% if apartment.image %}
-                    <img src="{{ apartment.image.url }}" alt="Unit">
-                    {% else %}
-                    <div class="mini-img-placeholder">
-                        <small>No Image</small>
-                    </div>
-                    {% endif %}
-                    <div class="mini-unit-details">
-                        <span class="unit-code">Unit {{ apartment.unit_number }}</span>
-                        <span class="unit-price">₱{{ apartment.price_per_month|floatformat:0 }}/mo</span>
-                    </div>
-                </a>
-                {% endfor %}
+            <div class="dashboard-column shadow-card">
+                <div class="column-header">
+                    <h2>Featured Units</h2>
+                    <a href="{% url 'apartment_list' %}" class="link-action">Browse All</a>
+                </div>
+
+                <div class="mini-unit-list">
+                    {% for apartment in featured_apartments|slice:":3" %}
+                    <a href="{% url 'apartment_detail' apartment.pk %}" class="mini-unit-item">
+                        {% if apartment.image %}
+                        <img src="{{ apartment.image.url }}" alt="Unit">
+                        {% else %}
+                        <div class="mini-img-placeholder">
+                            <small>No Image</small>
+                        </div>
+                        {% endif %}
+                        <div class="mini-unit-details">
+                            <span class="unit-code">Unit {{ apartment.unit_number }}</span>
+                            <span class="unit-price">₱{{ apartment.price_per_month|floatformat:0 }}/mo</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
             </div>
         </div>
     </div>
@@ -110,8 +112,23 @@
         --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
-    .dashboard { padding: 1.5rem 0; }
-    .main-title { font-size: 2rem; color: var(--dark); font-weight: 800; }
+    /* Wrapper for proper spacing on larger screens */
+    .dashboard-wrapper {
+        background-color: #f8fafc;
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 0 20px;
+    }
+
+    .container.dashboard {
+        width: 100%;
+        max-width: 1400px;
+        padding: 1.5rem 0;
+    }
+
+    .main-title { font-size: 2rem; color: var(--dark); font-weight: 800; margin: 0; }
     .subtitle { color: var(--gray-text); margin-top: 4px; }
 
     .page-header {
@@ -134,7 +151,11 @@
         text-align: center;
     }
 
-    .btn-primary-style:hover { background-color: #1d4ed8; transform: translateY(-2px); }
+    .btn-primary-style:hover { 
+        background-color: #1d4ed8; 
+        transform: translateY(-2px); 
+        box-shadow: 0 4px 6px rgba(37, 99, 235, 0.4);
+    }
 
     /* STATS GRID */
     .stats-grid {
@@ -150,6 +171,12 @@
         border-radius: 12px;
         border-left: 5px solid var(--border);
         box-shadow: var(--shadow);
+        transition: all 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15);
     }
 
     .stat-card.primary-border { border-left-color: var(--primary); }
@@ -157,8 +184,20 @@
     .stat-card.warning-border { border-left-color: var(--warning); }
     .stat-card.info-border { border-left-color: var(--info); }
 
-    .stat-label { font-size: 0.8rem; color: var(--gray-text); font-weight: 700; text-transform: uppercase; }
-    .stat-value { font-size: 1.75rem; font-weight: 800; color: var(--dark); margin-top: 5px; }
+    .stat-label { 
+        font-size: 0.8rem; 
+        color: var(--gray-text); 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        display: block;
+    }
+    .stat-value { 
+        font-size: 1.75rem; 
+        font-weight: 800; 
+        color: var(--dark); 
+        margin-top: 5px; 
+        margin-bottom: 0;
+    }
 
     /* LAYOUT GRID */
     .dashboard-main-grid {
@@ -172,6 +211,7 @@
         border-radius: 16px;
         padding: 1.5rem;
         border: 1px solid var(--border);
+        box-shadow: var(--shadow);
     }
 
     .column-header {
@@ -181,11 +221,43 @@
         margin-bottom: 1.5rem;
     }
 
-    .column-header h2 { font-size: 1.25rem; font-weight: 700; }
-    .link-action { text-decoration: none; color: var(--primary); font-weight: 600; font-size: 0.85rem; }
+    .column-header h2 { 
+        font-size: 1.25rem; 
+        font-weight: 700; 
+        margin: 0;
+    }
+    .link-action { 
+        text-decoration: none; 
+        color: var(--primary); 
+        font-weight: 600; 
+        font-size: 0.85rem; 
+        transition: color 0.2s;
+    }
+    .link-action:hover {
+        color: #1d4ed8;
+    }
 
     /* ACTIVITY FEED */
-    .activity-feed-container { max-height: 400px; overflow-y: auto; padding-right: 5px; }
+    .activity-feed-container { 
+        max-height: 400px; 
+        overflow-y: auto; 
+        padding-right: 5px; 
+    }
+    
+    .activity-feed-container::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .activity-feed-container::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+    
+    .activity-feed-container::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 10px;
+    }
+    
     .activity-item {
         display: flex;
         align-items: center;
@@ -194,19 +266,44 @@
         background: #f8fafc;
         gap: 12px;
         margin-bottom: 0.75rem;
+        transition: background 0.2s;
+    }
+    
+    .activity-item:hover {
+        background: #f1f5f9;
     }
 
-    .activity-status-indicator { width: 4px; height: 30px; border-radius: 2px; flex-shrink: 0; }
+    .activity-status-indicator { 
+        width: 4px; 
+        height: 30px; 
+        border-radius: 2px; 
+        flex-shrink: 0; 
+    }
     .activity-status-indicator.pending { background: var(--warning); }
     .activity-status-indicator.approved { background: var(--success); }
     .activity-status-indicator.denied { background: #ef4444; }
 
     .activity-content { flex: 1; }
-    .activity-content p { margin: 0; font-size: 0.9rem; color: var(--dark); line-height: 1.4; }
-    .activity-time { font-size: 0.75rem; color: var(--gray-text); }
+    .activity-content p { 
+        margin: 0; 
+        font-size: 0.9rem; 
+        color: var(--dark); 
+        line-height: 1.4; 
+    }
+    .activity-time { 
+        font-size: 0.75rem; 
+        color: var(--gray-text); 
+        display: block;
+        margin-top: 4px;
+    }
 
     /* MINI UNITS */
-    .mini-unit-list { display: flex; flex-direction: column; gap: 10px; }
+    .mini-unit-list { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 10px; 
+    }
+    
     .mini-unit-item {
         display: flex;
         align-items: center;
@@ -215,40 +312,123 @@
         padding: 10px;
         border-radius: 10px;
         border: 1px solid var(--border);
-        transition: 0.2s;
+        transition: all 0.2s;
     }
-    .mini-unit-item:hover { border-color: var(--primary); background: #f0f7ff; }
+    .mini-unit-item:hover { 
+        border-color: var(--primary); 
+        background: #f0f7ff; 
+        transform: translateX(4px);
+    }
 
     .mini-unit-item img, .mini-img-placeholder {
-        width: 60px; height: 60px; border-radius: 8px; object-fit: cover;
+        width: 60px; 
+        height: 60px; 
+        border-radius: 8px; 
+        object-fit: cover;
+        flex-shrink: 0;
     }
 
     .mini-img-placeholder { 
-        background: #f1f5f9; display: flex; align-items: center; justify-content: center; 
-        color: var(--gray-text); font-size: 0.65rem; text-align: center; font-weight: 700;
+        background: #f1f5f9; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        color: var(--gray-text); 
+        font-size: 0.65rem; 
+        text-align: center; 
+        font-weight: 700;
     }
 
-    .unit-code { display: block; font-weight: 700; color: var(--dark); font-size: 0.95rem; }
-    .unit-price { font-size: 0.85rem; color: var(--primary); font-weight: 600; }
+    .mini-unit-details {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .unit-code { 
+        display: block; 
+        font-weight: 700; 
+        color: var(--dark); 
+        font-size: 0.95rem; 
+    }
+    .unit-price { 
+        font-size: 0.85rem; 
+        color: var(--primary); 
+        font-weight: 600; 
+    }
 
     /* BADGES */
     .badge-status {
-        padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; text-transform: uppercase;
+        padding: 4px 8px; 
+        border-radius: 4px; 
+        font-size: 0.65rem; 
+        font-weight: 800; 
+        text-transform: uppercase;
+        white-space: nowrap;
     }
     .badge-status.pending { background: #fff7ed; color: #9a3412; }
     .badge-status.approved { background: #f0fdf4; color: #166534; }
+    .badge-status.denied { background: #fee2e2; color: #991b1b; }
+
+    .empty-placeholder {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--gray-text);
+    }
 
     /* RESPONSIVE */
     @media (max-width: 992px) {
-        .dashboard-main-grid { grid-template-columns: 1fr; }
+        .dashboard-main-grid { 
+            grid-template-columns: 1fr; 
+        }
     }
 
     @media (max-width: 768px) {
-        .page-header { flex-direction: column; align-items: stretch; }
-        .mobile-full-width { width: 100%; }
-        .activity-item { flex-wrap: wrap; }
-        .badge-status { order: 3; width: 100%; text-align: center; margin-top: 5px; }
-        .activity-content { order: 2; }
+        .dashboard-wrapper {
+            padding: 0 16px;
+        }
+        
+        .container.dashboard {
+            padding: 1rem 0;
+        }
+        
+        .page-header { 
+            flex-direction: column; 
+            align-items: stretch; 
+        }
+        
+        .mobile-full-width { 
+            width: 100%; 
+        }
+        
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .activity-item { 
+            flex-wrap: wrap; 
+        }
+        
+        .badge-status { 
+            order: 3; 
+            width: 100%; 
+            text-align: center; 
+            margin-top: 5px; 
+        }
+        
+        .activity-content { 
+            order: 2; 
+        }
+    }
+
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .main-title {
+            font-size: 1.5rem;
+        }
     }
 </style>
 {% endblock %}
