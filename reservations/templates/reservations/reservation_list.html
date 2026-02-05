@@ -1,75 +1,187 @@
 {% extends 'base.html' %}
-
 {% block title %}My Reservations - Apartment Reservation{% endblock %}
-
 {% block content %}
-<div class="container res-list-container">
-    <div class="page-header">
-        <div class="header-text">
-            <h1>Reservations</h1>
-            <p>Track your housing applications and active leases.</p>
+<div class="reservations-wrapper">
+    <div class="container res-list-container">
+        <div class="page-header">
+            <div class="header-text">
+                <h1>Reservations</h1>
+                <p>Track your housing applications and active leases.</p>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'reservation_create' %}" class="btn btn-primary">
+                    <span>+ New Reservation</span>
+                </a>
+            </div>
         </div>
-        <div class="header-actions">
-            <a href="{% url 'reservation_create' %}" class="btn btn-primary">
-                <span>+ New Reservation</span>
-            </a>
+        <div class="res-summary">
+            <div class="stat-pill">
+                <span class="stat-count">{{ reservations.count }}</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-pill">
+                <span class="stat-count">
+                    {% if user.is_staff %}Admin View{% else %}Resident View{% endif %}
+                </span>
+                <span class="stat-label">Mode</span>
+            </div>
         </div>
+        {% if reservations %}
+        <div class="reservations-grid">
+            {% for reservation in reservations %}
+                {% include 'atomic/molecules/reservation_card.html' with reservation=reservation %}
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-list-card">
+            <div class="empty-visual">No Data Found</div>
+            <h3>No reservations yet</h3>
+            <p>You haven't made any apartment reservations. Start by browsing our available units.</p>
+            <div class="empty-actions">
+                <a href="{% url 'apartment_list' %}" class="btn btn-primary">Browse Units</a>
+                <a href="{% url 'reservation_create' %}" class="btn btn-outline">Start Application</a>
+            </div>
+        </div>
+        {% endif %}
     </div>
-
-    <div class="res-summary">
-        <div class="stat-pill">
-            <span class="stat-count">{{ reservations.count }}</span>
-            <span class="stat-label">Total</span>
-        </div>
-        <div class="stat-pill">
-            <span class="stat-count">
-                {% if user.is_staff %}Admin View{% else %}Resident View{% endif %}
-            </span>
-            <span class="stat-label">Mode</span>
-        </div>
-    </div>
-
-    {% if reservations %}
-    <div class="reservations-grid">
-        {% for reservation in reservations %}
-            {% include 'atomic/molecules/reservation_card.html' with reservation=reservation %}
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty-list-card">
-        <div class="empty-visual">No Data Found</div>
-        <h3>No reservations yet</h3>
-        <p>You haven't made any apartment reservations. Start by browsing our available units.</p>
-        <div class="empty-actions">
-            <a href="{% url 'apartment_list' %}" class="btn btn-primary">Browse Units</a>
-            <a href="{% url 'reservation_create' %}" class="btn btn-outline">Start Application</a>
-        </div>
-    </div>
-    {% endif %}
 </div>
-
 <style>
-    .res-list-container { max-width: 1100px; margin: 2rem auto; }
+    :root {
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --dark: #1e293b;
+        --gray-500: #64748b;
+        --gray-300: #cbd5e1;
+        --gray-200: #e2e8f0;
+        --gray-100: #f1f5f9;
+        --radius-xl: 16px;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* WRAPPER FOR PROPER SPACING */
+    .reservations-wrapper {
+        background-color: #f8fafc;
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 0 20px;
+    }
+
+    .res-list-container { 
+        width: 100%;
+        max-width: 1400px; 
+        padding: 2rem 0;
+    }
 
     /* Page Header */
     .page-header { 
-        display: flex; justify-content: space-between; align-items: center; 
-        margin-bottom: 2rem; gap: 1rem;
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        margin-bottom: 2rem; 
+        gap: 1rem;
     }
-    .header-text h1 { margin: 0; font-size: 2rem; color: var(--dark); }
-    .header-text p { margin: 4px 0 0 0; color: var(--gray-500); }
+
+    .header-text h1 { 
+        margin: 0; 
+        font-size: 2rem; 
+        color: var(--dark); 
+        font-weight: 700;
+    }
+
+    .header-text p { 
+        margin: 6px 0 0 0; 
+        color: var(--gray-500); 
+        font-size: 1rem;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    /* CONSISTENT BUTTON STYLING */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--primary-hover);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-outline {
+        background-color: white;
+        color: var(--dark);
+        border-color: var(--gray-200);
+    }
+
+    .btn-outline:hover {
+        background-color: var(--dark);
+        color: white;
+        border-color: var(--dark);
+    }
 
     /* Summary Bar */
     .res-summary { 
-        display: flex; gap: 15px; margin-bottom: 2rem; 
-        padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-100);
+        display: flex; 
+        gap: 15px; 
+        margin-bottom: 2rem; 
+        padding-bottom: 1.5rem; 
+        border-bottom: 1px solid var(--gray-100);
+        flex-wrap: wrap;
     }
+
     .stat-pill { 
-        background: white; border: 1px solid var(--gray-200); 
-        padding: 8px 16px; border-radius: 50px; display: flex; align-items: center; gap: 10px;
+        background: white; 
+        border: 1px solid var(--gray-200); 
+        padding: 10px 18px; 
+        border-radius: 50px; 
+        display: flex; 
+        align-items: center; 
+        gap: 10px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
     }
-    .stat-count { font-weight: 800; color: var(--primary); font-size: 0.9rem; }
-    .stat-label { color: var(--gray-500); font-size: 0.8rem; text-transform: uppercase; font-weight: 700; }
+
+    .stat-pill:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-count { 
+        font-weight: 800; 
+        color: var(--primary); 
+        font-size: 0.95rem; 
+    }
+
+    .stat-label { 
+        color: var(--gray-500); 
+        font-size: 0.75rem; 
+        text-transform: uppercase; 
+        font-weight: 700; 
+        letter-spacing: 0.5px;
+    }
 
     /* Grid Layout */
     .reservations-grid {
@@ -81,25 +193,125 @@
 
     /* Empty State */
     .empty-list-card {
-        text-align: center; background: white; padding: 5rem 2rem;
-        border-radius: var(--radius-xl); border: 2px dashed var(--gray-200);
+        text-align: center; 
+        background: white; 
+        padding: 5rem 2rem;
+        border-radius: var(--radius-xl); 
+        border: 2px dashed var(--gray-200);
+        box-shadow: var(--shadow);
     }
-    .empty-visual { 
-        font-weight: 900; font-size: 0.85rem; color: var(--gray-300); 
-        text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1.5rem;
-    }
-    .empty-list-card h3 { margin: 0 0 10px 0; color: var(--dark); }
-    .empty-list-card p { color: var(--gray-500); margin-bottom: 2rem; max-width: 400px; margin-left: auto; margin-right: auto; }
-    .empty-actions { display: flex; gap: 12px; justify-content: center; }
 
-    /* Responsive */
+    .empty-visual { 
+        font-weight: 900; 
+        font-size: 0.85rem; 
+        color: var(--gray-300); 
+        text-transform: uppercase; 
+        letter-spacing: 2px; 
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-list-card h3 { 
+        margin: 0 0 10px 0; 
+        color: var(--dark); 
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    .empty-list-card p { 
+        color: var(--gray-500); 
+        margin-bottom: 2rem; 
+        max-width: 400px; 
+        margin-left: auto; 
+        margin-right: auto; 
+        line-height: 1.6;
+    }
+
+    .empty-actions { 
+        display: flex; 
+        gap: 12px; 
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 992px) {
+        .reservations-grid {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+    }
+
     @media (max-width: 768px) {
-        .page-header { flex-direction: column; align-items: flex-start; }
-        .header-actions { width: 100%; }
-        .header-actions .btn { width: 100%; justify-content: center; }
-        .reservations-grid { grid-template-columns: 1fr; }
-        .res-summary { overflow-x: auto; padding-bottom: 1rem; }
-        .stat-pill { flex-shrink: 0; }
+        .reservations-wrapper {
+            padding: 0 16px;
+        }
+
+        .res-list-container {
+            padding: 1.5rem 0;
+        }
+
+        .page-header { 
+            flex-direction: column; 
+            align-items: flex-start; 
+        }
+
+        .header-text h1 {
+            font-size: 1.75rem;
+        }
+
+        .header-actions { 
+            width: 100%; 
+        }
+
+        .header-actions .btn { 
+            width: 100%; 
+            justify-content: center; 
+        }
+
+        .reservations-grid { 
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        .res-summary { 
+            overflow-x: auto; 
+            padding-bottom: 1rem;
+            gap: 12px;
+        }
+
+        .stat-pill { 
+            flex-shrink: 0; 
+        }
+
+        .empty-list-card {
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .empty-actions .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header-text h1 {
+            font-size: 1.5rem;
+        }
+
+        .header-text p {
+            font-size: 0.9rem;
+        }
+
+        .empty-list-card {
+            padding: 2.5rem 1rem;
+        }
+
+        .empty-list-card h3 {
+            font-size: 1.25rem;
+        }
     }
 </style>
 {% endblock %}
