@@ -16,6 +16,39 @@
                 <a href="{% url 'reservation_list' %}" class="back-link">← Back to List</a>
             </div>
 
+            {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <div class="alert-icon">
+                        {% if message.tags == 'error' %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                            <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="10" cy="14" r="1" fill="currentColor"/>
+                        </svg>
+                        {% elif message.tags == 'success' %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                            <path d="M6 10L9 13L14 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        {% else %}
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                            <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="10" cy="14" r="1" fill="currentColor"/>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="alert-content">
+                        <strong>{% if message.tags == 'error' %}Error{% elif message.tags == 'success' %}Success{% else %}Notice{% endif %}</strong>
+                        <p>{{ message }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
             {% if is_admin and action == 'Create' %}
             <div class="admin-banner">
                 <div class="banner-icon">
@@ -103,6 +136,26 @@ $(document).ready(function() {
         width: '100%',
         theme: 'default'
     });
+
+    // Set minimum date to today for check_in field
+    const checkInField = document.querySelector('input[name="check_in"]');
+    if (checkInField) {
+        const today = new Date().toISOString().split('T')[0];
+        checkInField.setAttribute('min', today);
+        
+        // Add real-time validation
+        checkInField.addEventListener('change', function() {
+            const selectedDate = new Date(this.value);
+            const todayDate = new Date(today);
+            
+            if (selectedDate < todayDate) {
+                this.setCustomValidity('Please select a current or future date. Past dates are not allowed.');
+                this.reportValidity();
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
 });
 </script>
 
@@ -119,6 +172,12 @@ $(document).ready(function() {
         --gray-200: #e2e8f0;
         --gray-100: #f1f5f9;
         --gray-50: #f8fafc;
+        --error-red: #ef4444;
+        --error-bg: #fef2f2;
+        --error-border: #fecaca;
+        --success-green: #10b981;
+        --success-bg: #f0fdf4;
+        --success-border: #bbf7d0;
         --radius-xl: 16px;
         --radius-md: 8px;
         --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -189,6 +248,87 @@ $(document).ready(function() {
     .back-link:hover { 
         color: var(--primary);
         background: var(--primary-light);
+    }
+
+    /* MESSAGES/ALERTS */
+    .messages-container {
+        margin-bottom: 2rem;
+    }
+
+    .alert {
+        display: flex;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: var(--radius-md);
+        margin-bottom: 1rem;
+        align-items: flex-start;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .alert-error {
+        background: var(--error-bg);
+        border-left: 4px solid var(--error-red);
+        color: #991b1b;
+    }
+
+    .alert-success {
+        background: var(--success-bg);
+        border-left: 4px solid var(--success-green);
+        color: #065f46;
+    }
+
+    .alert-warning, .alert-info {
+        background: #fffbeb;
+        border-left: 4px solid #f59e0b;
+        color: #92400e;
+    }
+
+    .alert-icon {
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .alert-error .alert-icon {
+        color: var(--error-red);
+    }
+
+    .alert-success .alert-icon {
+        color: var(--success-green);
+    }
+
+    .alert-warning .alert-icon, .alert-info .alert-icon {
+        color: #f59e0b;
+    }
+
+    .alert-content {
+        flex: 1;
+    }
+
+    .alert-content strong {
+        display: block;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+    }
+
+    .alert-content p {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
     }
 
     /* ADMIN BANNER */
@@ -289,6 +429,15 @@ $(document).ready(function() {
         border-color: var(--primary); 
         outline: none; 
         box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+
+    /* Date input with error state */
+    .styled-form input:invalid {
+        border-color: var(--error-red);
+    }
+
+    .styled-form input:invalid:focus {
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
     }
 
     .styled-form textarea {
@@ -477,6 +626,12 @@ $(document).ready(function() {
         }
 
         .admin-banner {
+            padding: 1rem;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .alert {
             padding: 1rem;
             flex-direction: column;
             gap: 0.75rem;
