@@ -16,37 +16,30 @@
                 <a href="{% url 'reservation_list' %}" class="back-link">← Back to List</a>
             </div>
 
+            <!-- ONLY PAST DATE ERROR MESSAGE -->
             {% if messages %}
-            <div class="messages-container">
                 {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    <div class="alert-icon">
-                        {% if message.tags == 'error' %}
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
-                            <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <circle cx="10" cy="14" r="1" fill="currentColor"/>
-                        </svg>
-                        {% elif message.tags == 'success' %}
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
-                            <path d="M6 10L9 13L14 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                        {% else %}
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                            <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
-                            <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            <circle cx="10" cy="14" r="1" fill="currentColor"/>
-                        </svg>
-                        {% endif %}
+                    {% if 'past date' in message|lower or 'Cannot reserve past dates' in message %}
+                    <div class="past-date-error" id="pastDateError">
+                        <div class="error-icon">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                                <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                <circle cx="10" cy="14" r="1" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <div class="error-content">
+                            <strong>ERROR</strong>
+                            <p>{{ message }}</p>
+                        </div>
+                        <button type="button" class="close-btn" onclick="closeError()">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M4 4L12 12M12 4L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
                     </div>
-                    <div class="alert-content">
-                        <strong>{% if message.tags == 'error' %}Error{% elif message.tags == 'success' %}Success{% else %}Notice{% endif %}</strong>
-                        <p>{{ message }}</p>
-                    </div>
-                </div>
+                    {% endif %}
                 {% endfor %}
-            </div>
             {% endif %}
 
             {% if is_admin and action == 'Create' %}
@@ -142,21 +135,19 @@ $(document).ready(function() {
     if (checkInField) {
         const today = new Date().toISOString().split('T')[0];
         checkInField.setAttribute('min', today);
-        
-        // Add real-time validation
-        checkInField.addEventListener('change', function() {
-            const selectedDate = new Date(this.value);
-            const todayDate = new Date(today);
-            
-            if (selectedDate < todayDate) {
-                this.setCustomValidity('Please select a current or future date. Past dates are not allowed.');
-                this.reportValidity();
-            } else {
-                this.setCustomValidity('');
-            }
-        });
     }
 });
+
+// Close error message
+function closeError() {
+    const errorBox = document.getElementById('pastDateError');
+    if (errorBox) {
+        errorBox.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+            errorBox.style.display = 'none';
+        }, 300);
+    }
+}
 </script>
 
 <style>
@@ -172,12 +163,6 @@ $(document).ready(function() {
         --gray-200: #e2e8f0;
         --gray-100: #f1f5f9;
         --gray-50: #f8fafc;
-        --error-red: #ef4444;
-        --error-bg: #fef2f2;
-        --error-border: #fecaca;
-        --success-green: #10b981;
-        --success-bg: #f0fdf4;
-        --success-border: #bbf7d0;
         --radius-xl: 16px;
         --radius-md: 8px;
         --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -250,19 +235,17 @@ $(document).ready(function() {
         background: var(--primary-light);
     }
 
-    /* MESSAGES/ALERTS */
-    .messages-container {
+    /* PAST DATE ERROR MESSAGE */
+    .past-date-error {
+        background: #fef2f2;
+        border-left: 4px solid #ef4444;
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius-md);
         margin-bottom: 2rem;
-    }
-
-    .alert {
         display: flex;
         gap: 1rem;
-        padding: 1.25rem 1.5rem;
-        border-radius: var(--radius-md);
-        margin-bottom: 1rem;
         align-items: flex-start;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px rgba(239, 68, 68, 0.1);
         animation: slideIn 0.3s ease-out;
     }
 
@@ -277,58 +260,61 @@ $(document).ready(function() {
         }
     }
 
-    .alert-error {
-        background: var(--error-bg);
-        border-left: 4px solid var(--error-red);
-        color: #991b1b;
+    @keyframes slideOut {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
     }
 
-    .alert-success {
-        background: var(--success-bg);
-        border-left: 4px solid var(--success-green);
-        color: #065f46;
-    }
-
-    .alert-warning, .alert-info {
-        background: #fffbeb;
-        border-left: 4px solid #f59e0b;
-        color: #92400e;
-    }
-
-    .alert-icon {
+    .error-icon {
+        color: #ef4444;
         flex-shrink: 0;
         margin-top: 2px;
     }
 
-    .alert-error .alert-icon {
-        color: var(--error-red);
-    }
-
-    .alert-success .alert-icon {
-        color: var(--success-green);
-    }
-
-    .alert-warning .alert-icon, .alert-info .alert-icon {
-        color: #f59e0b;
-    }
-
-    .alert-content {
+    .error-content {
         flex: 1;
     }
 
-    .alert-content strong {
+    .error-content strong {
+        color: #991b1b;
         display: block;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         text-transform: uppercase;
         margin-bottom: 4px;
         letter-spacing: 0.5px;
         font-weight: 700;
     }
 
-    .alert-content p {
+    .error-content p {
         margin: 0;
         font-size: 0.95rem;
+        color: #991b1b;
         line-height: 1.5;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: #991b1b;
+        cursor: pointer;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .close-btn:hover {
+        background: #fee2e2;
+        color: #7f1d1d;
     }
 
     /* ADMIN BANNER */
@@ -429,15 +415,6 @@ $(document).ready(function() {
         border-color: var(--primary); 
         outline: none; 
         box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-    }
-
-    /* Date input with error state */
-    .styled-form input:invalid {
-        border-color: var(--error-red);
-    }
-
-    .styled-form input:invalid:focus {
-        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
     }
 
     .styled-form textarea {
@@ -631,10 +608,8 @@ $(document).ready(function() {
             gap: 0.75rem;
         }
 
-        .alert {
-            padding: 1rem;
-            flex-direction: column;
-            gap: 0.75rem;
+        .past-date-error {
+            padding: 0.875rem 1rem;
         }
 
         .form-footer { 
