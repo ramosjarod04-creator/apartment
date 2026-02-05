@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Count
 from django.utils import timezone
+from datetime import date
 from .forms import RegisterForm, TenantProfileForm, ApartmentForm, ReservationForm
 from django.contrib.auth.models import User
 from .models import Apartment, Reservation, Tenant, Notification, Message, Conversation
@@ -268,6 +269,16 @@ def reservation_create_view(request):
             reservation = form.save(commit=False)
             reservation.user = request.user
             
+            # Validate that check_in date is not in the past
+            if reservation.check_in < date.today():
+                messages.error(request, 'Cannot reserve past dates. Please select a current or future move-in date.')
+                context = {
+                    'form': form,
+                    'action': 'Create',
+                    'is_admin': request.user.is_staff,
+                }
+                return render(request, 'reservations/reservation_form.html', context)
+            
             # If Admin chooses "Auto-approve"
             if request.user.is_staff and request.POST.get('auto_approve'):
                 reservation.status = 'approved'
@@ -334,7 +345,19 @@ def reservation_update_view(request, pk):
     if request.method == 'POST':
         form = ReservationForm(request.POST, instance=reservation)
         if form.is_valid():
-            form.save()
+            updated_reservation = form.save(commit=False)
+            
+            # Validate that check_in date is not in the past (also for updates)
+            if updated_reservation.check_in < date.today():
+                messages.error(request, 'Cannot set reservation to a past date. Please select a current or future move-in date.')
+                context = {
+                    'form': form,
+                    'action': 'Update',
+                    'is_admin': request.user.is_staff,
+                }
+                return render(request, 'reservations/reservation_form.html', context)
+            
+            updated_reservation.save()
             messages.success(request, 'Reservation updated successfully!')
             return redirect('reservation_list')
     else:
@@ -656,7 +679,6 @@ def send_message_view(request):
 @login_required
 def my_apartment_view(request):
     """Display current tenant's apartment details and payment info"""
-    from datetime import date
     
     # Get user's active approved reservation
     active_reservation = Reservation.objects.filter(
