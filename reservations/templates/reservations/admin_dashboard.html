@@ -3,128 +3,144 @@
 {% block title %}Admin Panel - Apartment Reservation{% endblock %}
 
 {% block content %}
-<div class="container admin-panel">
-    <div class="page-header">
-        <div class="header-text">
-            <h1>Admin Panel</h1>
-            <p>Management Dashboard for Administrators</p>
+<div class="admin-wrapper">
+    <div class="container admin-panel">
+        <div class="page-header">
+            <div class="header-text">
+                <h1>Admin Panel</h1>
+                <p>Management Dashboard for Administrators</p>
+            </div>
+            <a href="{% url 'dashboard' %}" class="btn btn-outline mobile-full-width">Back to Dashboard</a>
         </div>
-        <a href="{% url 'dashboard' %}" class="btn btn-outline mobile-full-width">Back to Dashboard</a>
-    </div>
 
-    <div class="stats-grid">
-        <div class="stat-card warning">
-            <div class="stat-content">
-                <h3>Pending Approvals</h3>
-                <p class="stat-value">{{ pending_reservations.count }}</p>
+        <div class="stats-grid">
+            <div class="stat-card warning">
+                <div class="stat-content">
+                    <h3>Pending Approvals</h3>
+                    <p class="stat-value">{{ pending_reservations.count }}</p>
+                </div>
+            </div>
+
+            <div class="stat-card info">
+                <div class="stat-content">
+                    <h3>Total Users</h3>
+                    <p class="stat-value">{{ total_users }}</p>
+                </div>
+            </div>
+
+            <div class="stat-card primary">
+                <div class="stat-content">
+                    <h3>Total Reservations</h3>
+                    <p class="stat-value">{{ total_reservations }}</p>
+                </div>
+            </div>
+
+            <div class="stat-card success">
+                <div class="stat-content">
+                    <h3>Approved Today</h3>
+                    <p class="stat-value">{{ approved_today }}</p>
+                </div>
             </div>
         </div>
 
-        <div class="stat-card info">
-            <div class="stat-content">
-                <h3>Total Users</h3>
-                <p class="stat-value">{{ total_users }}</p>
+        <div class="section">
+            <h2>Quick Actions</h2>
+            <div class="quick-actions-grid">
+                <a href="{% url 'apartment_create' %}" class="action-card">
+                    <h3>Add Apartment</h3>
+                    <p>Create a new unit entry</p>
+                </a>
+
+                <a href="{% url 'apartment_list' %}" class="action-card">
+                    <h3>Manage Units</h3>
+                    <p>Edit or remove apartments</p>
+                </a>
+
+                <a href="{% url 'reservation_list' %}?view=all" class="action-card">
+                    <h3>All Reservations</h3>
+                    <p>Full history and logs</p>
+                </a>
+
+                <a href="{% url 'reservation_create' %}" class="action-card">
+                    <h3>Manual Booking</h3>
+                    <p>Reserve for a tenant</p>
+                </a>
             </div>
         </div>
 
-        <div class="stat-card primary">
-            <div class="stat-content">
-                <h3>Total Reservations</h3>
-                <p class="stat-value">{{ total_reservations }}</p>
+        <div class="section pending-section">
+            <div class="section-header">
+                <h2>Pending Approvals ({{ pending_reservations.count }})</h2>
+                <a href="{% url 'reservation_list' %}?view=all&status=pending" class="btn btn-secondary btn-sm">View All</a>
             </div>
-        </div>
 
-        <div class="stat-card success">
-            <div class="stat-content">
-                <h3>Approved Today</h3>
-                <p class="stat-value">{{ approved_today }}</p>
+            {% if pending_reservations %}
+            <div class="admin-reservations-table">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Tenant</th>
+                            <th>Apartment</th>
+                            <th>Dates</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reservation in pending_reservations %}
+                        <tr>
+                            <td data-label="Tenant">
+                                <strong>{{ reservation.user.get_full_name|default:reservation.user.username }}</strong><br>
+                                <small>{{ reservation.user.email }}</small>
+                            </td>
+                            <td data-label="Apartment">
+                                {{ reservation.apartment.name }}<br>
+                                <small>Unit {{ reservation.apartment.unit_number }}</small>
+                            </td>
+                            <td data-label="Dates">
+                                <div class="mobile-date-stack">
+                                    <span>{{ reservation.check_in }}</span>
+                                    <span class="to-separator">to</span>
+                                    <span>{{ reservation.check_out }}</span>
+                                </div>
+                            </td>
+                            <td data-label="Total" class="amount">₱{{ reservation.total_price|floatformat:2 }}</td>
+                            <td data-label="Actions" class="actions">
+                                <a href="{% url 'reservation_approve' reservation.pk %}" class="btn btn-success btn-sm">Approve</a>
+                                <a href="{% url 'reservation_deny' reservation.pk %}" class="btn btn-danger btn-sm">Deny</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>No pending approvals</h3>
+                <p>All items have been reviewed.</p>
+            </div>
+            {% endif %}
         </div>
-    </div>
-
-    <div class="section">
-        <h2>Quick Actions</h2>
-        <div class="quick-actions-grid">
-            <a href="{% url 'apartment_create' %}" class="action-card">
-                <h3>Add Apartment</h3>
-                <p>Create a new unit entry</p>
-            </a>
-
-            <a href="{% url 'apartment_list' %}" class="action-card">
-                <h3>Manage Units</h3>
-                <p>Edit or remove apartments</p>
-            </a>
-
-            <a href="{% url 'reservation_list' %}?view=all" class="action-card">
-                <h3>All Reservations</h3>
-                <p>Full history and logs</p>
-            </a>
-
-            <a href="{% url 'reservation_create' %}" class="action-card">
-                <h3>Manual Booking</h3>
-                <p>Reserve for a tenant</p>
-            </a>
-        </div>
-    </div>
-
-    <div class="section pending-section">
-        <div class="section-header">
-            <h2>Pending Approvals ({{ pending_reservations.count }})</h2>
-            <a href="{% url 'reservation_list' %}?view=all&status=pending" class="btn btn-secondary btn-sm">View All</a>
-        </div>
-
-        {% if pending_reservations %}
-        <div class="admin-reservations-table">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Tenant</th>
-                        <th>Apartment</th>
-                        <th>Dates</th>
-                        <th>Total</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for reservation in pending_reservations %}
-                    <tr>
-                        <td data-label="Tenant">
-                            <strong>{{ reservation.user.get_full_name|default:reservation.user.username }}</strong><br>
-                            <small>{{ reservation.user.email }}</small>
-                        </td>
-                        <td data-label="Apartment">
-                            {{ reservation.apartment.name }}<br>
-                            <small>Unit {{ reservation.apartment.unit_number }}</small>
-                        </td>
-                        <td data-label="Dates">
-                            <div class="mobile-date-stack">
-                                <span>{{ reservation.check_in }}</span>
-                                <span class="to-separator">to</span>
-                                <span>{{ reservation.check_out }}</span>
-                            </div>
-                        </td>
-                        <td data-label="Total" class="amount">₱{{ reservation.total_price|floatformat:2 }}</td>
-                        <td data-label="Actions" class="actions">
-                            <a href="{% url 'reservation_approve' reservation.pk %}" class="btn btn-success btn-sm">Approve</a>
-                            <a href="{% url 'reservation_deny' reservation.pk %}" class="btn btn-danger btn-sm">Deny</a>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <h3>No pending approvals</h3>
-            <p>All items have been reviewed.</p>
-        </div>
-        {% endif %}
     </div>
 </div>
 
 <style>
+/* PC / Desktop Centering Fix */
+.admin-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    background-color: transparent; /* Inherits from base */
+}
+
+.admin-panel { 
+    width: 100%;
+    max-width: 1200px; /* Standard dashboard width for PC */
+    padding: 2rem 24px; /* Space on the left and right */
+    box-sizing: border-box;
+}
+
 /* Layout */
-.admin-panel { padding: 1.5rem 0; }
 .page-header { 
     display: flex; 
     justify-content: space-between; 
@@ -136,66 +152,73 @@
 /* Stats */
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
 .stat-card {
     background: white;
     padding: 1.5rem;
-    border-radius: var(--radius-lg);
-    border-top: 4px solid var(--gray-200);
-    box-shadow: var(--shadow-sm);
+    border-radius: 12px;
+    border-top: 4px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.stat-card.warning { border-top-color: var(--warning); }
-.stat-card.info { border-top-color: var(--info); }
-.stat-card.primary { border-top-color: var(--primary); }
-.stat-card.success { border-top-color: var(--success); }
+.stat-card.warning { border-top-color: #f59e0b; }
+.stat-card.info { border-top-color: #3b82f6; }
+.stat-card.primary { border-top-color: #6366f1; }
+.stat-card.success { border-top-color: #10b981; }
 
-.stat-value { font-size: 2rem; font-weight: 800; color: var(--gray-900); }
-.stat-content h3 { font-size: 0.8rem; text-transform: uppercase; color: var(--gray-500); letter-spacing: 0.05em; }
+.stat-value { font-size: 2rem; font-weight: 800; color: #1e293b; }
+.stat-content h3 { font-size: 0.75rem; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
 
 /* Quick Actions */
 .quick-actions-grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-    gap: 1rem; 
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+    gap: 1.5rem; 
     margin-top: 1rem; 
 }
 
 .action-card { 
     background-color: white; 
     padding: 1.5rem; 
-    border-radius: var(--radius-lg); 
-    border: 1px solid var(--gray-200);
+    border-radius: 12px; 
+    border: 1px solid #e2e8f0;
     text-decoration: none; 
     color: inherit; 
     transition: all 0.2s ease;
 }
 
 .action-card:hover { 
-    background-color: var(--primary-subtle);
-    border-color: var(--primary);
+    background-color: #f8fafc;
+    border-color: #3b82f6;
+    transform: translateY(-2px);
 }
 
-.action-card h3 { color: var(--primary); margin-bottom: 0.25rem; font-size: 1.1rem; }
-.action-card p { color: var(--gray-600); font-size: 0.85rem; }
+.action-card h3 { color: #3b82f6; margin-bottom: 0.25rem; font-size: 1.1rem; }
+.action-card p { color: #64748b; font-size: 0.85rem; }
 
 /* Responsive Table */
-.admin-reservations-table { border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden; }
+.admin-reservations-table { 
+    border: 1px solid #e2e8f0; 
+    border-radius: 12px; 
+    overflow: hidden; 
+    background: white;
+}
 .data-table { width: 100%; border-collapse: collapse; }
-.data-table th { background: var(--gray-50); padding: 1rem; text-align: left; font-size: 0.85rem; color: var(--gray-600); }
-.data-table td { padding: 1rem; border-top: 1px solid var(--gray-100); background: white; }
+.data-table th { background: #f8fafc; padding: 1rem; text-align: left; font-size: 0.85rem; color: #64748b; }
+.data-table td { padding: 1rem; border-top: 1px solid #f1f5f9; background: white; }
 
 @media (max-width: 768px) {
-    .page-header { flex-direction: column; align-items: stretch; }
-    .mobile-full-width { text-align: center; }
+    .admin-panel { padding: 1rem; }
+    .page-header { flex-direction: column; align-items: stretch; text-align: center; }
+    .mobile-full-width { width: 100%; }
 
-    /* Card Layout for Tables */
+    /* Card Layout for Tables on Mobile */
     .data-table thead { display: none; }
-    .data-table tr { display: block; border-bottom: 8px solid var(--gray-50); }
+    .data-table tr { display: block; border-bottom: 8px solid #f8fafc; }
     .data-table td { 
         display: flex; 
         justify-content: space-between; 
@@ -206,13 +229,13 @@
     .data-table td::before { 
         content: attr(data-label); 
         font-weight: 700; 
-        color: var(--gray-500); 
-        font-size: 0.8rem; 
+        color: #94a3b8; 
+        font-size: 0.75rem; 
         text-transform: uppercase;
     }
     .mobile-date-stack { display: flex; flex-direction: column; }
-    .to-separator { font-size: 0.7rem; color: var(--gray-400); }
-    .data-table .actions { flex-direction: row; justify-content: flex-end; }
+    .to-separator { font-size: 0.7rem; color: #cbd5e1; }
+    .data-table .actions { flex-direction: row; justify-content: flex-end; gap: 0.5rem; }
 }
 </style>
 {% endblock %}
