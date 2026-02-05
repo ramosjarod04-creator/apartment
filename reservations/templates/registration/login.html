@@ -3,25 +3,90 @@
 {% block title %}Login - Apartment Reservation{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <h1>Welcome Back</h1>
-            <p>Login to manage your apartment reservations</p>
+<div style="
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    min-height: 80vh; 
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background-color: #f8fafc;
+">
+    <div style="
+        background: white; 
+        padding: 40px; 
+        border-radius: 16px; 
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        width: 100%; 
+        max-width: 400px;
+        border: 1px solid #e2e8f0;
+    ">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 28px; color: #1e293b; margin-bottom: 8px;">Welcome Back</h1>
+            <p style="color: #64748b; font-size: 14px;">Login to manage your apartment reservations</p>
         </div>
 
-        <form method="post" class="auth-form">
+        <form method="post">
             {% csrf_token %}
             
-            {% include 'atomic/atoms/input.html' with name='username' label='Username' type='text' required=True %}
-            {% include 'atomic/atoms/input.html' with name='password' label='Password' type='password' required=True %}
+            <div class="form-logic-wrapper" style="
+                display: flex; 
+                flex-direction: column; 
+                gap: 20px;
+            ">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% include 'atomic/atoms/input.html' with name='username' label='Username' type='text' required=True %}
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    {% include 'atomic/atoms/input.html' with name='password' label='Password' type='password' required=True %}
+                </div>
 
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
+                <button type="submit" style="
+                    background-color: #3d40e0; 
+                    color: white; 
+                    padding: 12px; 
+                    border: none; 
+                    border-radius: 8px; 
+                    font-weight: 600; 
+                    font-size: 16px; 
+                    cursor: pointer;
+                    transition: background 0.3s;
+                    margin-top: 10px;
+                ">
+                    Login
+                </button>
+            </div>
         </form>
 
-        <div class="auth-footer">
-            <p>Don't have an account? <a href="{% url 'register' %}" class="link">Register here</a></p>
+        <div style="
+            margin-top: 25px; 
+            padding-top: 20px; 
+            border-top: 1px solid #f1f5f9; 
+            text-align: center; 
+            font-size: 14px; 
+            color: #64748b;
+        ">
+            <p>Don't have an account? 
+                <a href="{% url 'register' %}" style="color: #3d40e0; text-decoration: none; font-weight: 600;">
+                    Register here
+                </a>
+            </p>
         </div>
     </div>
 </div>
+
+<style>
+    .form-logic-wrapper input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        margin-top: 4px;
+    }
+    .form-logic-wrapper label {
+        font-weight: 600;
+        font-size: 14px;
+        color: #475569;
+    }
+</style>
 {% endblock %}
