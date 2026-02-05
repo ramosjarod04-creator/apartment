@@ -1,114 +1,123 @@
 {% extends 'base.html' %}
 
-{% block title %}Admin Panel - Apartment Reservation{% endblock %}
+{% block title %}Dashboard - Apartment Reservation{% endblock %}
 
 {% block content %}
-<div class="admin-page-bg" style="background-color: #f8fafc; min-height: 100vh; width: 100%;">
-    <div class="admin-wrapper" style="display: flex; justify-content: center; width: 100%;">
-        <div class="admin-panel" style="width: 100%; max-width: 1240px; padding: 40px 24px; box-sizing: border-box;">
+<div class="dashboard-page-bg" style="background-color: #f8fafc; min-height: 100vh; width: 100%;">
+    <div class="dashboard-wrapper" style="display: flex; justify-content: center; width: 100%; padding: 0 20px;">
+        <div class="dashboard-container" style="width: 100%; max-width: 1400px; padding: 40px 0; box-sizing: border-box;">
             
+            <!-- Page Header -->
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; gap: 20px;">
                 <div class="header-text">
-                    <h1 style="font-size: 32px; font-weight: 700; color: #1e293b; margin: 0;">Admin Panel</h1>
-                    <p style="color: #64748b; margin: 6px 0 0 0; font-size: 16px;">Management Dashboard for Administrators</p>
+                    <h1 style="font-size: 32px; font-weight: 700; color: #1e293b; margin: 0;">Dashboard</h1>
+                    <p style="color: #64748b; margin: 6px 0 0 0; font-size: 16px;">Welcome back, admin!</p>
                 </div>
-                <a href="{% url 'dashboard' %}" class="btn-dashboard-back" style="border: 1px solid #e2e8f0; background: white; color: #475569; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s;">
-                    Back to Dashboard
+                <a href="{% url 'reservation_create' %}" class="btn-new-booking" style="background: #3b82f6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 14px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);">
+                    + New Booking
                 </a>
             </div>
 
-            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 40px;">
-                <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-top: 4px solid #f59e0b;">
-                    <h3 style="font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin: 0 0 12px 0;">Pending Approvals</h3>
-                    <p style="font-size: 36px; font-weight: 800; color: #1e293b; margin: 0;">{{ pending_reservations.count }}</p>
+            <!-- Stats Grid -->
+            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 40px;">
+                <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 4px solid #64748b; transition: all 0.3s;">
+                    <h3 style="font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin: 0 0 12px 0; font-weight: 600;">Total Units</h3>
+                    <p style="font-size: 36px; font-weight: 800; color: #1e293b; margin: 0;">5</p>
                 </div>
 
-                <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-top: 4px solid #3b82f6;">
-                    <h3 style="font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin: 0 0 12px 0;">Total Users</h3>
-                    <p style="font-size: 36px; font-weight: 800; color: #1e293b; margin: 0;">{{ total_users }}</p>
+                <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 4px solid #10b981; transition: all 0.3s;">
+                    <h3 style="font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin: 0 0 12px 0; font-weight: 600;">Available</h3>
+                    <p style="font-size: 36px; font-weight: 800; color: #10b981; margin: 0;">4</p>
                 </div>
 
-                <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-top: 4px solid #6366f1;">
-                    <h3 style="font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin: 0 0 12px 0;">Total Reservations</h3>
-                    <p style="font-size: 36px; font-weight: 800; color: #1e293b; margin: 0;">{{ total_reservations }}</p>
+                <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 4px solid #f59e0b; transition: all 0.3s;">
+                    <h3 style="font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin: 0 0 12px 0; font-weight: 600;">Pending</h3>
+                    <p style="font-size: 36px; font-weight: 800; color: #f59e0b; margin: 0;">0</p>
                 </div>
 
-                <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-top: 4px solid #10b981;">
-                    <h3 style="font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin: 0 0 12px 0;">Approved Today</h3>
-                    <p style="font-size: 36px; font-weight: 800; color: #1e293b; margin: 0;">{{ approved_today }}</p>
+                <div class="stat-card" style="background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 4px solid #3b82f6; transition: all 0.3s;">
+                    <h3 style="font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin: 0 0 12px 0; font-weight: 600;">Approved</h3>
+                    <p style="font-size: 36px; font-weight: 800; color: #3b82f6; margin: 0;">1</p>
                 </div>
             </div>
 
-            <div class="section" style="margin-bottom: 48px;">
-                <h2 style="font-size: 20px; color: #1e293b; margin-bottom: 20px;">Quick Actions</h2>
-                <div class="quick-actions-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;">
-                    <a href="{% url 'apartment_create' %}" class="action-card">
-                        <h3>Add Apartment</h3>
-                        <p>Create a new unit entry</p>
-                    </a>
-                    <a href="{% url 'apartment_list' %}" class="action-card">
-                        <h3>Manage Units</h3>
-                        <p>Edit or remove apartments</p>
-                    </a>
-                    <a href="{% url 'reservation_list' %}?view=all" class="action-card">
-                        <h3>All Reservations</h3>
-                        <p>Full history and logs</p>
-                    </a>
-                    <a href="{% url 'reservation_create' %}" class="action-card">
-                        <h3>Manual Booking</h3>
-                        <p>Reserve for a tenant</p>
-                    </a>
-                </div>
-            </div>
+            <!-- Content Grid (Two Columns on Desktop) -->
+            <div class="content-grid" style="display: grid; grid-template-columns: 1fr; gap: 32px;">
+                
+                <!-- Recent Reservations Section -->
+                <div class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">Recent Reservations</h2>
+                        <a href="{% url 'reservation_list' %}" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s;">View All Details →</a>
+                    </div>
 
-            <div class="section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="font-size: 20px; color: #1e293b; margin: 0;">Pending Approvals ({{ pending_reservations.count }})</h2>
-                    <a href="{% url 'reservation_list' %}?view=all&status=pending" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 600;">View All</a>
+                    <div class="reservations-container" style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+                        <!-- Sample Reservation Item -->
+                        <div class="reservation-item" style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; transition: background 0.2s;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                    <span style="background: #dcfce7; color: #166534; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">APPROVED</span>
+                                    <strong style="color: #1e293b; font-size: 15px;">Unit 001</strong>
+                                </div>
+                                <p style="color: #64748b; margin: 0; font-size: 14px;">reserved by <strong>JAROD RAMOS</strong></p>
+                                <p style="color: #94a3b8; margin: 4px 0 0 0; font-size: 13px;">Jan 27, 2026</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Empty State (if no reservations) -->
+                        <!-- Uncomment below if there are no reservations -->
+                        <!--
+                        <div style="text-align: center; padding: 60px 20px;">
+                            <h3 style="color: #64748b; margin-bottom: 8px; font-size: 18px;">No recent reservations</h3>
+                            <p style="color: #94a3b8; font-size: 14px; margin: 0;">New bookings will appear here.</p>
+                        </div>
+                        -->
+                    </div>
                 </div>
 
-                {% if pending_reservations %}
-                <div class="admin-reservations-table" style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
-                                <th style="padding: 16px; text-align: left; font-size: 13px; color: #64748b; font-weight: 600;">Tenant</th>
-                                <th style="padding: 16px; text-align: left; font-size: 13px; color: #64748b; font-weight: 600;">Apartment</th>
-                                <th style="padding: 16px; text-align: left; font-size: 13px; color: #64748b; font-weight: 600;">Dates</th>
-                                <th style="padding: 16px; text-align: left; font-size: 13px; color: #64748b; font-weight: 600;">Total</th>
-                                <th style="padding: 16px; text-align: right; font-size: 13px; color: #64748b; font-weight: 600;">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for reservation in pending_reservations %}
-                            <tr style="border-bottom: 1px solid #f1f5f9;">
-                                <td style="padding: 20px 16px;">
-                                    <strong style="color: #1e293b; display: block; font-size: 14px;">{{ reservation.user.get_full_name|default:reservation.user.username }}</strong>
-                                    <small style="color: #94a3b8;">{{ reservation.user.email }}</small>
-                                </td>
-                                <td style="padding: 20px 16px; font-size: 14px; color: #475569;">
-                                    {{ reservation.apartment.name }}<br>
-                                    <small style="color: #94a3b8;">Unit {{ reservation.apartment.unit_number }}</small>
-                                </td>
-                                <td style="padding: 20px 16px; font-size: 14px; color: #475569;">
-                                    {{ reservation.check_in }} <span style="color: #cbd5e1; margin: 0 4px;">→</span> {{ reservation.check_out }}
-                                </td>
-                                <td style="padding: 20px 16px; font-weight: 700; color: #1e293b;">₱{{ reservation.total_price|floatformat:2 }}</td>
-                                <td style="padding: 20px 16px; text-align: right;">
-                                    <a href="{% url 'reservation_approve' reservation.pk %}" style="background: #dcfce7; color: #166534; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700; margin-left: 8px;">Approve</a>
-                                    <a href="{% url 'reservation_deny' reservation.pk %}" style="background: #fee2e2; color: #991b1b; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700; margin-left: 8px;">Deny</a>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <!-- Featured Units Section -->
+                <div class="section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="font-size: 20px; font-weight: 700; color: #1e293b; margin: 0;">Featured Units</h2>
+                        <a href="{% url 'apartment_list' %}" style="color: #3b82f6; text-decoration: none; font-size: 14px; font-weight: 600; transition: color 0.2s;">Browse All →</a>
+                    </div>
+
+                    <div class="units-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                        <!-- Unit Card 002 -->
+                        <div class="unit-card" style="background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div style="position: relative; padding-bottom: 60%; overflow: hidden; background: #f1f5f9;">
+                                <img src="unit-002-image.jpg" alt="Unit 002" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div style="padding: 20px;">
+                                <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0 0 8px 0;">Unit 002</h3>
+                                <p style="color: #3b82f6; font-size: 20px; font-weight: 700; margin: 0;">₱2500<span style="font-size: 14px; font-weight: 400; color: #64748b;">/mo</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Unit Card 003 -->
+                        <div class="unit-card" style="background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div style="position: relative; padding-bottom: 60%; overflow: hidden; background: #f1f5f9;">
+                                <img src="unit-003-image.jpg" alt="Unit 003" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div style="padding: 20px;">
+                                <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0 0 8px 0;">Unit 003</h3>
+                                <p style="color: #3b82f6; font-size: 20px; font-weight: 700; margin: 0;">₱2500<span style="font-size: 14px; font-weight: 400; color: #64748b;">/mo</span></p>
+                            </div>
+                        </div>
+
+                        <!-- Unit Card 004 -->
+                        <div class="unit-card" style="background: white; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: all 0.3s;">
+                            <div style="position: relative; padding-bottom: 60%; overflow: hidden; background: #f1f5f9;">
+                                <img src="unit-004-image.jpg" alt="Unit 004" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div style="padding: 20px;">
+                                <h3 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0 0 8px 0;">Unit 004</h3>
+                                <p style="color: #3b82f6; font-size: 20px; font-weight: 700; margin: 0;">₱2500<span style="font-size: 14px; font-weight: 400; color: #64748b;">/mo</span></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                {% else %}
-                <div style="text-align: center; padding: 60px; background: white; border-radius: 16px; border: 1px dashed #cbd5e1;">
-                    <h3 style="color: #64748b; margin-bottom: 8px;">No pending approvals</h3>
-                    <p style="color: #94a3b8; font-size: 14px; margin: 0;">Everything is up to date.</p>
-                </div>
-                {% endif %}
+
             </div>
 
         </div>
@@ -116,37 +125,82 @@
 </div>
 
 <style>
-    /* Professional Hover Effects */
-    .action-card {
-        background: white;
-        padding: 24px;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-        text-decoration: none;
-        transition: all 0.25s ease;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    /* Hover Effects */
+    .btn-new-booking:hover {
+        background: #2563eb !important;
+        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4) !important;
+        transform: translateY(-1px);
     }
-    .action-card:hover {
+
+    .stat-card:hover {
         transform: translateY(-4px);
-        border-color: #3b82f6;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1) !important;
     }
-    .action-card h3 { color: #3b82f6; margin: 0 0 4px 0; font-size: 16px; font-weight: 700; }
-    .action-card p { color: #64748b; margin: 0; font-size: 13px; }
 
-    .btn-dashboard-back:hover { background: #f8fafc !important; border-color: #cbd5e1 !important; }
+    .unit-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px -5px rgba(0,0,0,0.15) !important;
+        border-color: #cbd5e1;
+    }
 
-    /* Mobile Adaptations */
+    .reservation-item:hover {
+        background: #f8fafc;
+    }
+
+    /* Desktop: Two-column layout for content sections */
+    @media (min-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1.2fr 1fr !important;
+        }
+    }
+
+    /* Tablet and Mobile Responsiveness */
     @media (max-width: 768px) {
-        .page-header { flex-direction: column; align-items: flex-start !important; }
-        .btn-dashboard-back { width: 100%; text-align: center; }
-        
-        /* Table to Mobile Cards */
-        table, thead, tbody, th, td, tr { display: block; }
-        thead tr { position: absolute; top: -9999px; left: -9999px; }
-        tr { border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 16px; padding: 8px; background: white; }
-        td { border: none; position: relative; padding-left: 50% !important; text-align: right !important; }
-        td:before { position: absolute; left: 16px; width: 45%; padding-right: 10px; white-space: nowrap; font-weight: 700; color: #64748b; content: attr(data-label); text-align: left; }
+        .dashboard-wrapper {
+            padding: 0 16px !important;
+        }
+
+        .dashboard-container {
+            padding: 24px 0 !important;
+        }
+
+        .page-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+        }
+
+        .btn-new-booking {
+            width: 100%;
+            text-align: center;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 16px !important;
+        }
+
+        .content-grid {
+            gap: 24px !important;
+        }
+
+        .units-grid {
+            grid-template-columns: 1fr !important;
+        }
+    }
+
+    /* Small mobile */
+    @media (max-width: 480px) {
+        .stats-grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        h1 {
+            font-size: 24px !important;
+        }
+
+        .stat-card p {
+            font-size: 28px !important;
+        }
     }
 </style>
 {% endblock %}
