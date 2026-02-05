@@ -3,63 +3,65 @@
 {% block title %}Apartment Units{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="page-header">
-        <div class="header-content">
-            <h1 class="main-title">Available Units</h1>
-            <p class="subtitle">Discover your next home in our managed compounds</p>
-        </div>
-        {% if user.is_staff %}
-        <a href="{% url 'apartment_create' %}" class="btn-filter-style">+ Add New Unit</a>
-        {% endif %}
-    </div>
-
-    {% include 'atomic/molecules/filter_bar.html' %}
-
-    <div class="units-grid">
-        {% for apartment in apartments %}
-        <div class="unit-card {% if apartment.status == 'occupied' %}unit-occupied{% endif %}">
-            <div class="unit-image-box">
-                {% if apartment.status == 'occupied' %}
-                <div class="status-tag occupied">Occupied</div>
-                {% else %}
-                <div class="status-tag available">Available</div>
-                {% endif %}
-                
-                {% if apartment.image %}
-                <img src="{{ apartment.image.url }}" alt="Unit {{ apartment.unit_number }}">
-                {% else %}
-                <div class="img-placeholder">
-                    <span>No Image Available</span>
-                </div>
-                {% endif %}
-                
-                <div class="price-overlay">₱{{ apartment.price_per_month|floatformat:0 }}/mo</div>
+<div class="apartments-wrapper">
+    <div class="container">
+        <div class="page-header">
+            <div class="header-content">
+                <h1 class="main-title">Available Units</h1>
+                <p class="subtitle">Discover your next home in our managed compounds</p>
             </div>
+            {% if user.is_staff %}
+            <a href="{% url 'apartment_create' %}" class="btn-filter-style">+ Add New Unit</a>
+            {% endif %}
+        </div>
 
-            <div class="unit-content">
-                <div class="unit-header">
-                    <span class="compound-name">{{ apartment.name }}</span>
-                    <h2 class="unit-number">Unit {{ apartment.unit_number }}</h2>
-                </div>
-                
-                <div class="unit-specs">
-                    <div class="spec-item"><strong>{{ apartment.bedrooms }}</strong> Bed</div>
-                    <div class="spec-item"><strong>{{ apartment.bathrooms }}</strong> Bath</div>
-                    <div class="spec-item"><strong>{{ apartment.size_sqm }}</strong> m²</div>
+        {% include 'atomic/molecules/filter_bar.html' %}
+
+        <div class="units-grid">
+            {% for apartment in apartments %}
+            <div class="unit-card {% if apartment.status == 'occupied' %}unit-occupied{% endif %}">
+                <div class="unit-image-box">
+                    {% if apartment.status == 'occupied' %}
+                    <div class="status-tag occupied">Occupied</div>
+                    {% else %}
+                    <div class="status-tag available">Available</div>
+                    {% endif %}
+                    
+                    {% if apartment.image %}
+                    <img src="{{ apartment.image.url }}" alt="Unit {{ apartment.unit_number }}">
+                    {% else %}
+                    <div class="img-placeholder">
+                        <span>No Image Available</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="price-overlay">₱{{ apartment.price_per_month|floatformat:0 }}/mo</div>
                 </div>
 
-                <div class="unit-footer">
-                    <a href="{% url 'apartment_detail' apartment.pk %}" class="btn-view">View Details</a>
+                <div class="unit-content">
+                    <div class="unit-header">
+                        <span class="compound-name">{{ apartment.name }}</span>
+                        <h2 class="unit-number">Unit {{ apartment.unit_number }}</h2>
+                    </div>
+                    
+                    <div class="unit-specs">
+                        <div class="spec-item"><strong>{{ apartment.bedrooms }}</strong> Bed</div>
+                        <div class="spec-item"><strong>{{ apartment.bathrooms }}</strong> Bath</div>
+                        <div class="spec-item"><strong>{{ apartment.size_sqm }}</strong> m²</div>
+                    </div>
+
+                    <div class="unit-footer">
+                        <a href="{% url 'apartment_detail' apartment.pk %}" class="btn-view">View Details</a>
+                    </div>
                 </div>
             </div>
+            {% empty %}
+            <div class="empty-state">
+                <h3>No units found</h3>
+                <p>Try adjusting your filters or check back later.</p>
+            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="empty-state">
-            <h3>No units found</h3>
-            <p>Try adjusting your filters or check back later.</p>
-        </div>
-        {% endfor %}
     </div>
 </div>
 
@@ -73,6 +75,22 @@
         --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     }
 
+    /* WRAPPER FOR PROPER SPACING */
+    .apartments-wrapper {
+        background-color: var(--bg-light);
+        min-height: 100vh;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 0 20px;
+    }
+
+    .apartments-wrapper .container {
+        width: 100%;
+        max-width: 1400px;
+        padding: 1.5rem 0;
+    }
+
     /* HEADER STYLING */
     .page-header {
         display: flex;
@@ -82,8 +100,18 @@
         gap: 1rem;
     }
 
-    .main-title { font-size: 2rem; color: var(--dark); font-weight: 700; margin-bottom: 4px; }
-    .subtitle { color: var(--gray-text); }
+    .main-title { 
+        font-size: 2rem; 
+        color: var(--dark); 
+        font-weight: 700; 
+        margin-bottom: 4px;
+        margin-top: 0;
+    }
+    
+    .subtitle { 
+        color: var(--gray-text); 
+        margin: 0;
+    }
 
     .btn-filter-style {
         display: inline-flex;
@@ -104,6 +132,7 @@
         background-color: var(--primary-hover);
         transform: translateY(-1px);
         color: white;
+        box-shadow: 0 4px 6px rgba(37, 99, 235, 0.4);
     }
 
     /* GRID & CARDS */
@@ -119,13 +148,16 @@
         border-radius: 16px;
         overflow: hidden;
         box-shadow: var(--shadow);
-        transition: transform 0.3s ease;
+        transition: all 0.3s ease;
         border: 1px solid #e2e8f0;
         display: flex;
         flex-direction: column;
     }
 
-    .unit-card:hover { transform: translateY(-4px); }
+    .unit-card:hover { 
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px -5px rgba(0,0,0,0.15);
+    }
 
     .unit-image-box {
         position: relative;
@@ -133,7 +165,16 @@
         background: #f1f5f9;
     }
 
-    .unit-image-box img { width: 100%; height: 100%; object-fit: cover; }
+    .unit-image-box img { 
+        width: 100%; 
+        height: 100%; 
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .unit-card:hover .unit-image-box img {
+        transform: scale(1.05);
+    }
 
     .img-placeholder {
         display: flex;
@@ -144,6 +185,7 @@
         font-size: 0.8rem;
         text-transform: uppercase;
         letter-spacing: 1px;
+        font-weight: 600;
     }
 
     .price-overlay {
@@ -152,9 +194,11 @@
         left: 12px;
         background: rgba(15, 23, 42, 0.9);
         color: white;
-        padding: 6px 12px;
+        padding: 8px 14px;
         border-radius: 6px;
         font-weight: 700;
+        font-size: 0.95rem;
+        backdrop-filter: blur(4px);
     }
 
     .status-tag {
@@ -167,13 +211,37 @@
         font-weight: 800;
         text-transform: uppercase;
         z-index: 2;
+        letter-spacing: 0.5px;
     }
     .available { background: #dcfce7; color: #166534; }
     .occupied { background: #fee2e2; color: #991b1b; }
 
-    .unit-content { padding: 1.25rem; flex-grow: 1; display: flex; flex-direction: column; }
-    .compound-name { font-size: 0.7rem; text-transform: uppercase; color: var(--primary); font-weight: 700; }
-    .unit-number { font-size: 1.25rem; color: var(--dark); margin: 4px 0 12px 0; }
+    .unit-content { 
+        padding: 1.25rem; 
+        flex-grow: 1; 
+        display: flex; 
+        flex-direction: column; 
+    }
+    
+    .unit-header {
+        margin-bottom: 0.75rem;
+    }
+    
+    .compound-name { 
+        font-size: 0.7rem; 
+        text-transform: uppercase; 
+        color: var(--primary); 
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        display: block;
+    }
+    
+    .unit-number { 
+        font-size: 1.25rem; 
+        color: var(--dark); 
+        margin: 4px 0 0 0; 
+        font-weight: 700;
+    }
 
     .unit-specs {
         display: flex;
@@ -183,6 +251,23 @@
         border-bottom: 1px solid #f1f5f9;
         color: var(--gray-text);
         font-size: 0.85rem;
+        margin-bottom: auto;
+    }
+
+    .spec-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .spec-item strong {
+        color: var(--dark);
+        font-size: 1rem;
+    }
+
+    .unit-footer {
+        margin-top: auto;
     }
 
     .btn-view {
@@ -195,13 +280,66 @@
         border-radius: 8px;
         text-decoration: none;
         font-weight: 700;
-        transition: 0.2s;
+        transition: all 0.2s;
+        border: 2px solid transparent;
     }
 
-    .btn-view:hover { background: var(--dark); color: white; }
+    .btn-view:hover { 
+        background: var(--dark); 
+        color: white;
+        border-color: var(--dark);
+    }
+
+    /* OCCUPIED STATE */
+    .unit-occupied { 
+        opacity: 0.75; 
+    }
+    
+    .unit-occupied .unit-image-box img { 
+        filter: grayscale(0.8); 
+    }
+    
+    .unit-occupied:hover {
+        opacity: 0.85;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem 1rem;
+        background: white;
+        border-radius: 12px;
+        border: 2px dashed #cbd5e1;
+    }
+
+    .empty-state h3 {
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+        font-size: 1.25rem;
+    }
+
+    .empty-state p {
+        color: var(--gray-text);
+        margin: 0;
+    }
 
     /* RESPONSIVE DESIGN */
+    @media (max-width: 992px) {
+        .units-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+    }
+
     @media (max-width: 768px) {
+        .apartments-wrapper {
+            padding: 0 16px;
+        }
+
+        .apartments-wrapper .container {
+            padding: 1rem 0;
+        }
+
         .page-header {
             flex-direction: column;
             align-items: flex-start;
@@ -213,23 +351,32 @@
         }
 
         .units-grid {
-            grid-template-columns: 1fr; /* Single column on phones */
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 16px;
+            padding: 16px 0;
         }
 
-        .main-title { font-size: 1.75rem; }
+        .main-title { 
+            font-size: 1.75rem; 
+        }
+
+        .unit-image-box {
+            height: 180px;
+        }
     }
 
-    .unit-occupied { opacity: 0.8; }
-    .unit-occupied img { filter: grayscale(1); }
+    @media (max-width: 480px) {
+        .units-grid {
+            grid-template-columns: 1fr;
+        }
 
-    .empty-state {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 3rem 1rem;
-        background: var(--bg-light);
-        border-radius: 12px;
-        border: 2px dashed #cbd5e1;
+        .main-title {
+            font-size: 1.5rem;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+        }
     }
 </style>
 {% endblock %}
